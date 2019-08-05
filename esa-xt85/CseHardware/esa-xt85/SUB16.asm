@@ -1,0 +1,17 @@
+cpu "8085.tbl"
+hof "int8"
+
+org 9000h
+
+
+LHLD 8840H
+XCHG
+LHLD 8842H
+MOV A, E
+SUB L
+STA 8900H
+MOV A, D
+SBB H
+STA 8901H
+
+RST 5

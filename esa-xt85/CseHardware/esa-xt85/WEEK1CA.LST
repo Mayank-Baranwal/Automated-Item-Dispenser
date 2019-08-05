@@ -1,0 +1,92 @@
+ 0000           cpu "8085.tbl"
+ 0000           hof "int8"
+                
+ 9000           org 9000h
+                
+ 9000 3D        dcr a
+ 9001 CA1090    jz ADD
+ 9004 3D        dcr a
+ 9005 CA2A90    jz SUB
+ 9008 3D        dcr a
+ 9009 CA3790    jz MUL
+ 900C 3D        dcr a
+ 900D CA5290    jz DIV
+                
+ 9010           ADD:
+ 9010 214088    	lxi h, 8840H
+ 9013 5E        	mov e,m
+ 9014 23        	inx h
+ 9015 4E        	mov c,m
+ 9016 0600      	mvi b, 00H
+ 9018 1600      	mvi d, 00H
+                
+ 901A 210000    	lxi h, 0000H
+ 901D 09        	dad b
+ 901E 19        	dad d
+                
+ 901F 7D        	mov a, l
+ 9020 320089    	sta 8900H
+ 9023 7C        	mov a, h
+ 9024 320189    	sta 8901H
+ 9027 C36D90    	jmp OVER
+                
+ 902A           SUB:
+ 902A 214088    	lxi h, 8840H
+ 902D 7E        	mov a,m
+ 902E 23        	inx h
+ 902F 46        	mov b,m
+ 9030 90        	sub b
+ 9031 320089    	sta 8900H
+ 9034 C36D90    	jmp OVER
+                
+ 9037           MUL:
+ 9037 214088    	lxi h, 8840H
+ 903A 5E        	mov e, m
+ 903B 23        	inx h
+ 903C 46        	mov b, m
+ 903D 1600      	mvi d, 00H
+ 903F 210000    	lxi h, 0000H
+                
+ 9042           	LOOP:
+ 9042 19        		dad d
+ 9043 05        		dcr b
+ 9044 C24290    		jnz LOOP
+                
+ 9047 7D        	mov a, l
+ 9048 320089    	sta 8900H
+ 904B 7C        	mov a, h
+ 904C 320189    	sta 8901H
+                
+ 904F C36D90    	jmp OVER
+                
+ 9052           DIV:
+ 9052 214088    	lxi h, 8840H
+ 9055 7E        	mov a, m
+ 9056 23        	inx h
+ 9057 46        	mov b, m
+ 9058 0E00      	mvi c, 00H
+                
+ 905A           	LOOP2:
+ 905A B8        		cmp b
+ 905B DA6390    		jc STR
+ 905E 90        		sub b
+ 905F 0C        		inr c
+ 9060 C35A90    		jmp LOOP2
+                
+ 9063           	STR:
+ 9063 320089    		sta 8900H
+ 9066 79        		mov a,c
+ 9067 320189    		sta 8901H
+                
+ 906A C36D90    	jmp OVER
+                
+ 906D           OVER:
+ 906D EF        	RST 5
+ 906E           	END
+0007  A                    9010  ADD                  0000  B             
+0001  C                    0002  D                    9052  DIV           
+0003  E                    0004  H                    0005  L             
+9042  LOOP                 905A  LOOP2                0006  M             
+9037  MUL                  906D  OVER                 9063  STR           
+902A  SUB                  
+

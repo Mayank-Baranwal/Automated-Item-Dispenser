@@ -1,0 +1,22 @@
+ 0000           cpu "8085.tbl"
+ 0000           hof "int8"
+                
+ 9000           org 9000h
+                
+                
+ 9000 2A4088    LHLD 8840H
+ 9003 EB        XCHG
+ 9004 2A4288    LHLD 8842H
+ 9007 7B        MOV A, E
+ 9008 95        SUB L
+ 9009 320089    STA 8900H
+ 900C 7A        MOV A, D
+ 900D 9C        SBB H
+ 900E 320189    STA 8901H
+                
+ 9011 EF        RST 5
+ 9012           	END
+0007  A                    0000  B                    0001  C             
+0002  D                    0003  E                    0004  H             
+0005  L                    0006  M                    
+
