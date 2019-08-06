@@ -11,6 +11,8 @@ dcr a
 jz MUL
 dcr a
 jz DIV
+dcr a
+jz ORR
 
 ADD:
 	lxi h, 8840H
@@ -78,6 +80,15 @@ DIV:
 		mov a,c
 		sta 8901H
 
+	jmp OVER
+
+ORR:
+	lxi h, 8840H
+	mov a, m
+	inx h
+	mov b, m
+	ora b
+	sta 8900H
 	jmp OVER
 
 
