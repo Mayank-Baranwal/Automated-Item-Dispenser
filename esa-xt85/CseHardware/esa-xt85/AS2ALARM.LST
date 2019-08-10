@@ -1,0 +1,151 @@
+ 0000           cpu "8085.tbl"
+ 0000           hof "int8"
+                
+ 9000           org 9000h
+                
+ 8FF1 =         CURDT: EQU 8FF1H
+ 044C =         UPDDT: EQU 044cH
+ 8FEF =         CURAD: EQU 8FEFH
+ 0440 =         UPDAD: EQU 0440H
+ 0389 =         OUTPUT:EQU 0389H
+                
+ 9000 21FFFF    LXI H,0FFFFH
+ 9003 220089    SHLD 8900H
+                
+ 9006           TIMER:
+ 9006 210000    	LXI H, 0000H
+ 9009 3E99      	MVI A, 99H 
+ 900B 22EF8F    	SHLD CURAD
+ 900E 32F18F    	STA CURDT
+                
+ 9011           NXT_SEC:
+ 9011 2AEF8F    	LHLD CURAD
+ 9014 3AF18F    	LDA CURDT
+ 9017 3C        	INR A
+ 9018 27        	DAA
+ 9019 0660      	MVI B,60H
+ 901B B8        	CMP B
+ 901C C23D90    	JNZ ONE
+ 901F 3E00      		MVI A, 00H
+ 9021 32F18F    		STA CURDT
+ 9024 7D        		MOV A, L
+ 9025 3C        		INR A
+ 9026 27        		DAA
+ 9027 6F        		MOV L, A
+ 9028 0660      		MVI B,60H
+ 902A B8        		CMP B
+ 902B C24090    		JNZ TWO
+ 902E 2E00      			MVI L, 00H
+ 9030 7C        			MOV A, H
+ 9031 3C        			INR A
+ 9032 27        			DAA
+ 9033 67        			MOV H, A
+ 9034 0612      			MVI B,12H
+ 9036 B8        			CMP B
+ 9037 CA0690    			JZ TIMER
+ 903A C34090    			JMP TWO
+                
+ 903D           	ONE:
+ 903D 32F18F    	STA CURDT
+ 9040           	TWO:
+ 9040 22EF8F    	SHLD CURAD
+ 9043 3A4088    	LDA 8840H
+ 9046 CAAC90    	JZ THREE
+ 9049 4F        	MOV C,A
+ 904A 114088    	LXI D,8840H
+ 904D           	FOUR:
+                
+ 904D 13        	INX D
+ 904E EB        	XCHG
+ 904F 46        	MOV B,M
+ 9050 EB        	XCHG
+ 9051 3AF18F    	LDA CURDT
+ 9054 B8        	CMP B
+ 9055 CA5D90    	JZ LOL1
+ 9058 13        	INX D
+ 9059 13        	INX D
+ 905A C3A890    	JMP FIVE
+                
+ 905D           	LOL1:
+ 905D 13        	INX D
+ 905E EB        	XCHG
+ 905F 46        	MOV B,M
+ 9060 EB        	XCHG
+ 9061 2AEF8F    	LHLD CURAD
+ 9064 7D        	MOV A,L
+ 9065 B8        	CMP B
+ 9066 CA6D90    	JZ LOL2
+ 9069 13        	INX D
+ 906A C3A890    	JMP FIVE
+                
+ 906D           	LOL2:
+ 906D 13        	INX D
+ 906E EB        	XCHG
+ 906F 46        	MOV B,M
+ 9070 EB        	XCHG
+ 9071 2AEF8F    	LHLD CURAD
+ 9074 7C        	MOV A,H
+ 9075 B8        	CMP B
+ 9076 C2A890    	JNZ FIVE
+                
+ 9079 3AF18F    	LDA CURDT
+ 907C 320089    	STA 8900H
+ 907F 2AEF8F    	LHLD CURAD
+ 9082 220189    	SHLD 8901H
+ 9085 3EFF      	MVI A,0FFH
+ 9087 21FFFF    	LXI H,0FFFFH
+ 908A 32F18F    	STA CURDT
+ 908D 22EF8F    	SHLD CURAD
+ 9090 CD4C04    	CALL UPDDT
+ 9093 CD4004    	CALL UPDAD
+ 9096 CDBB90    	CALL DELAY
+ 9099 3A0089    	LDA 8900H
+ 909C 2A0189    	LHLD 8901H
+                
+ 909F 32F18F    	STA CURDT
+ 90A2 22EF8F    	SHLD CURAD
+                	; RST 5
+                
+ 90A5 C3AC90    	JMP THREE
+ 90A8           	FIVE:
+ 90A8 0D        	DCR C
+ 90A9 C24D90    	JNZ FOUR
+                
+                	
+                	; JMP TIMER
+ 90AC           	THREE: 
+ 90AC CD4C04    	CALL UPDDT
+ 90AF CD4004    	CALL UPDAD
+ 90B2 CDBB90    	CALL DELAY
+ 90B5 C31190    	JMP NXT_SEC
+                
+                
+ 90B8 C3CE90    JMP OVER
+                
+ 90BB           DELAY:
+ 90BB 210F54    	LXI H, 540FH
+ 90BE 110400    	LXI D, 0004H
+ 90C1           	LOOP1:
+ 90C1           		LOOP2:
+ 90C1           			LOOP3:
+ 90C1 2D        				DCR L
+ 90C2 C2C190    				JNZ LOOP3
+ 90C5 25        			DCR H
+ 90C6 C2C190    			JNZ LOOP2
+ 90C9 1D        		DCR E
+ 90CA C2C190    		JNZ LOOP1
+ 90CD C9        	RET
+                
+ 90CE           OVER: 
+ 90CE EF        RST 5
+ 90CF           	END
+0007  A                    0000  B                    0001  C             
+8FEF  CURAD                8FF1  CURDT                0002  D             
+90BB  DELAY                0003  E                    90A8  FIVE          
+904D  FOUR                 0004  H                    0005  L             
+905D  LOL1                 906D  LOL2                 90C1  LOOP1         
+90C1  LOOP2                90C1  LOOP3                0006  M             
+9011  NXT_SEC              903D  ONE                  0389  OUTPUT        
+90CE  OVER                 90AC  THREE                9006  TIMER         
+9040  TWO                  0440  UPDAD                044C  UPDDT         
+
