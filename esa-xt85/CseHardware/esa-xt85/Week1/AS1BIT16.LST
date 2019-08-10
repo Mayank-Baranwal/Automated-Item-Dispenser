@@ -1,0 +1,116 @@
+                ;program 2: 16 bit calculator
+                
+ 0000           cpu "8085.tbl"
+ 0000           hof "int8"
+                
+ 9000           org 9000h ;origin address of program at 9000h
+                
+                ;a=1 indicates addition
+ 9000 3D        dcr a
+ 9001 CA1390    jz ADD
+                ;a=2 indicates subtraction
+ 9004 3D        dcr a
+ 9005 CA3890    jz SUB
+                ;a=3 indicates multiplication
+ 9008 3D        dcr a
+ 9009 CA4C90    jz MUL
+                ;a=4 indicates division
+ 900C 3D        dcr a
+ 900D CA7090    jz DIV
+                ;if(a>4) simply go to end of file
+ 9010 C39390    jmp OVER
+                
+ 9013           ADD:
+ 9013 214088    	lxi h, 8840H
+ 9016 5E        	mov e,m ; load lower 8 bits of first number to register e from location 8840h
+ 9017 23        	inx h
+ 9018 56        	mov d,m ; load higher 8 bits of first number to register d from location 8841h
+ 9019 23        	inx h
+ 901A 4E        	mov c,m ; load lower 8 bits of second number to register e from location 8842h
+ 901B 23        	inx h
+ 901C 46        	mov b,m ; load higher 8 bits of second number to register d from location 8843h
+ 901D 210000    	lxi h, 0000h ; intialise hl with 0000h
+ 9020 09        	dad b ; add bc to hl
+ 9021 0600      	mvi b,00H ; b stores carry if any(17th bit)
+ 9023 19        	dad d ; add de to hl
+                	; xchg
+ 9024 D22990    	jnc NOCAR 
+ 9027 0601      	mvi b,01H ; if carry make b as 01h
+ 9029           	NOCAR:
+ 9029 7D        	mov a,l
+ 902A 320089    	sta 8900h ; store lower 8 bits of answer in location 8900h
+ 902D 7C        	mov a,h
+ 902E 320189    	sta 8901h ; store higher 8 bits of answer in location 8901h
+ 9031 78        	mov a,b
+ 9032 320289    	sta 8902h ; ; store carry(if any) in location 8902h
+ 9035 C39390    	jmp OVER
+                
+ 9038           SUB:
+ 9038 2A4088    	LHLD 8840H ; load first number in h-l register pair from 8840h(lower 8 bits) and 8841h(higher 8 bits)
+ 903B EB        	XCHG ; swap content of d-e and h-l
+ 903C 2A4288    	LHLD 8842H ; load second number in h-l register pair from 8842h(lower 8 bits) and 8843h(higher 8 bits)
+ 903F 7B        	MOV A, E 
+ 9040 95        	SUB L ; E-L
+ 9041 320089    	STA 8900H ; store lower 8 bits in location 8900h
+ 9044 7A        	MOV A, D
+ 9045 9C        	SBB H ; D-H(with borrow if any from previous)
+ 9046 320189    	STA 8901H ; store higher 8 bits in location 8901h
+ 9049 C39390    	jmp OVER
+                
+ 904C           MUL:
+ 904C 2A4088    	LHLD 8840h ; load first number in h-l register pair from 8840h(lower 8 bits) and 8841h(higher 8 bits)
+ 904F F9        	SPHL ; push content of h-l in stack
+ 9050 2A4288    	LHLD 8842h ; load second number in h-l register pair from 8842h(lower 8 bits) and 8843h(higher 8 bits)
+ 9053 EB        	XCHG ; swap content of d-e and h-l
+ 9054 210000    	LXI H, 0000H ;h-l stores lower 16 bits of answer
+ 9057 010000    	LXI B, 0000H ; b-c stores higher 16 bits of answer
+                	;add content of stack d-e times
+ 905A           	LBLMUL2:
+ 905A 39        	DAD SP
+ 905B D25F90    	JNC LBLMUL 
+ 905E 03        	INX B ; increment b-c if carry from h-l
+ 905F           	LBLMUL:
+ 905F 1B        	DCX D ; decrement d-e after every iteration
+ 9060 7B        	MOV A, E
+ 9061 B2        	ORA D ; d or e to check if d-e is 0 or not
+ 9062 C25A90    	JNZ LBLMUL2 ; loop again if d-e not zero
+                	; b-c-h-l is the final answer
+ 9065 220089    	SHLD 8900h ; store lower 16 bits in 8900h(lower 8 bits) and 8901h(higher 8 bits)
+ 9068 69        	MOV L, C
+ 9069 60        	MOV H, B
+ 906A 220289    	SHLD 8902h ; store higher 16 bits in 8902h(lower 8 bits) and 8903h(higher 8 bits)
+ 906D C39390    	jmp OVER
+                
+ 9070           DIV:
+ 9070 010000    	LXI B, 0000H 
+ 9073 2A4288    	LHLD 8842h ; load first number(dividend) in h-l register pair from 8842h(lower 8 bits) and 8843h(higher 8 bits)
+ 9076 EB        	XCHG ; swap content of d-e and h-l
+ 9077 2A4088    	LHLD 8840h ; load second number(divisor) in h-l register pair from 8840h(lower 8 bits) and 8841h(higher 8 bits)
+ 907A           	LBL2:
+ 907A 7D        	MOV A, L 
+ 907B 93        	SUB E ; l-e
+ 907C 6F        	MOV L, A ; store l-e in l
+ 907D 7C        	MOV A, H
+ 907E 9A        	SBB D ; h-d (with borrow if any)
+ 907F 67        	MOV H, A ; store h-d in h
+ 9080 DA8790    	JC LBL ; if carry triggered it means de>hl and we need to end
+ 9083 03        	INX B ; else increment quotient
+ 9084 C37A90    	JMP LBL2 ; loop back to LBL2
+ 9087           	LBL:
+ 9087 19        	DAD D ; we need to add de since an extra subtraction will be done in the last iteration of loop
+ 9088 220089    	SHLD 8900h ; h-l stores remainder and it is moved to location 8900h(lower 8 bits) and 8901h(higher 8 bits)
+ 908B 69        	MOV L, C
+ 908C 60        	MOV H, B
+ 908D 220289    	SHLD 8902h ; ; b-c stores quotient and it is moved to location 8902h(lower 8 bits) and 8903h(higher 8 bits)
+ 9090 C39390    	jmp OVER
+                
+ 9093           OVER:
+ 9093 EF        RST 5
+ 9094           	END
+0007  A                    9013  ADD                  0000  B             
+0001  C                    0002  D                    9070  DIV           
+0003  E                    0004  H                    0005  L             
+9087  LBL                  907A  LBL2                 905F  LBLMUL        
+905A  LBLMUL2              0006  M                    904C  MUL           
+9029  NOCAR                9093  OVER                 9038  SUB           
+

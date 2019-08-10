@@ -1,0 +1,117 @@
+                ;program 1: 8 bit calculator
+                
+ 0000           cpu "8085.tbl"
+ 0000           hof "int8"
+                
+ 9000           org 9000h ;origin address of program at 9000h
+                
+                ;a=1 indicates addition
+ 9000 3D        dcr a 
+ 9001 CA1790    jz ADD
+                ;a=2 indicates subtraction
+ 9004 3D        dcr a
+ 9005 CA3190    jz SUB
+                ;a=3 indicates multiplication
+ 9008 3D        dcr a
+ 9009 CA3E90    jz MUL
+                ;a=4 indicates division
+ 900C 3D        dcr a
+ 900D CA5990    jz DIV
+                ;a=5 indicates OR operation (additional feature)
+ 9010 3D        dcr a
+ 9011 CA7490    jz ORR
+                ;if(a>5) simply go to end of file
+ 9014 C38190    jmp OVER
+                
+                
+ 9017           ADD:
+ 9017 214088    	lxi h, 8840H 
+ 901A 5E        	mov e,m ;load 8 bits from addrress 8840 to register e
+ 901B 23        	inx h ; hl now stores 8841h
+ 901C 4E        	mov c,m ;load 8 bits from addrress 8841 to register c
+ 901D 0600      	mvi b, 00H 
+ 901F 1600      	mvi d, 00H
+                
+ 9021 210000    	lxi h, 0000H ; initialise hl with 0000h
+ 9024 09        	dad b ; add bc to hl;
+ 9025 19        	dad d ; add de to hl;
+                	; any carry will be indicated in h register
+ 9026 7D        	mov a, l
+ 9027 320089    	sta 8900H ; store lower 8 bits in location 8900h
+ 902A 7C        	mov a, h
+ 902B 320189    	sta 8901H ; store carry if any in location 8901h
+ 902E C38190    	jmp OVER
+                
+ 9031           SUB:
+ 9031 214088    	lxi h, 8840H 
+ 9034 7E        	mov a,m ;load 8 bits from addrress 8840 to register a
+ 9035 23        	inx h ; hl now stores 8841h
+ 9036 46        	mov b,m ;load 8 bits from addrress 8841 to register b
+ 9037 90        	sub b ; sub b from a
+ 9038 320089    	sta 8900H ; store result in 8900h
+ 903B C38190    	jmp OVER
+                
+ 903E           MUL:
+ 903E 214088    	lxi h, 8840H
+ 9041 5E        	mov e, m ;load 8 bits from addrress 8840 to register e
+ 9042 23        	inx h ; hl now stores 8841h
+ 9043 46        	mov b, m ;load 8 bits from addrress 8841 to register b
+ 9044 1600      	mvi d, 00H 
+ 9046 210000    	lxi h, 0000H ; hl stores answer and is initialised with 0
+                
+                	;adding de b times to hl
+ 9049           	LOOP: ; repeates till b becomes 0.
+ 9049 19        		dad d ;hl+=de
+ 904A 05        		dcr b ;b--
+ 904B C24990    		jnz LOOP 
+                
+ 904E 7D        	mov a, l
+ 904F 320089    	sta 8900H ; store lower 8 bits in location 8900h
+ 9052 7C        	mov a, h
+ 9053 320189    	sta 8901H ; store higher 8 bits in location 8901h
+                
+ 9056 C38190    	jmp OVER
+                
+ 9059           DIV:
+ 9059 214088    	lxi h, 8840H
+ 905C 7E        	mov a, m ;load 8 bits from addrress 8840 to register a
+ 905D 23        	inx h ; hl now stores 8841h
+ 905E 46        	mov b, m ;load 8 bits from addrress 8841 to register b
+ 905F 0E00      	mvi c, 00H ; c stores quotient
+                
+ 9061           	LOOP2:
+ 9061 B8        		cmp b ; check if a>=b
+ 9062 DA6A90    		jc STR ; if a<b exit loop
+ 9065 90        		sub b ; else sub b
+ 9066 0C        		inr c ; increment quotient
+ 9067 C36190    		jmp LOOP2
+                
+ 906A           	STR:
+ 906A 320089    		sta 8900H ; store remainder in location 8900h
+ 906D 79        		mov a,c
+ 906E 320189    		sta 8901H ; store quotient in location 8901h
+                
+ 9071 C38190    	jmp OVER
+                
+                
+                ;additional feature to or two 8 bits number
+ 9074           ORR:
+ 9074 214088    	lxi h, 8840H
+ 9077 7E        	mov a, m ;load 8 bits from addrress 8840 to register a
+ 9078 23        	inx h ; hl now stores 8841h
+ 9079 46        	mov b, m ;load 8 bits from addrress 8841 to register b
+ 907A B0        	ora b ; a or b(bitwise)
+ 907B 320089    	sta 8900H ;store result in 8900h
+ 907E C38190    	jmp OVER
+                
+                
+ 9081           OVER:
+ 9081 EF        	RST 5
+ 9082           	END
+0007  A                    9017  ADD                  0000  B             
+0001  C                    0002  D                    9059  DIV           
+0003  E                    0004  H                    0005  L             
+9049  LOOP                 9061  LOOP2                0006  M             
+903E  MUL                  9074  ORR                  9081  OVER          
+906A  STR                  9031  SUB                  
+

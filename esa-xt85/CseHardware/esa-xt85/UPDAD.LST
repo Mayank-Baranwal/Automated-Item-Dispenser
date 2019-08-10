@@ -1,0 +1,62 @@
+ 0000           cpu "8085.tbl"
+ 0000           hof "int8"
+                
+ 9000           org 9000h
+                
+ 030E =         GTHEX: EQU 030EH
+ 034F =         HXDSP: EQU 034FH
+ 0389 =         OUTPUT:EQU 0389H
+ 02BE =         CLEAR: EQU 02BEH
+ 03BA =         RDKBD: EQU 03BAH
+                
+ 8FF1 =         CURDT: EQU 8FF1H
+ 044C =         UPDDT: EQU 044cH
+ 8FEF =         CURAD: EQU 8FEFH
+ 0440 =         UPDAD: EQU 0440H
+                
+ 9000 213412    LXI H, 1234H
+ 9003 22EF8F    SHLD CURAD
+ 9006 3E56      MVI A, 56H
+ 9008 32F18F    STA CURDT
+ 900B CD4004    CALL UPDAD
+ 900E CD4C04    CALL UPDDT
+ 9011 CD2790    CALL DELAY
+                
+ 9014 3AF18F    LDA CURDT
+ 9017 3D        DCR A
+ 9018 32F18F    STA CURDT
+ 901B CD4004    CALL UPDAD
+ 901E CD4C04    CALL UPDDT
+ 9021 CD2790    CALL DELAY
+                
+                
+ 9024 C33390    JMP OVER
+                
+ 9027           DELAY:
+                	; LXI H, 00FFH
+                	; LOOP:
+                	; 	DCX H
+                	; 	MVI A, H
+                	; 	ORA L
+                	; 	JNZ LOOP
+                
+ 9027 21FFFF    	LXI H, 0FFFFH
+ 902A           	OLOOP:
+ 902A           		ILOOP:
+ 902A 2D        			DCR L
+ 902B C22A90    			JNZ ILOOP
+ 902E 25        		DCR H
+ 902F C22A90    		JNZ OLOOP
+ 9032 C9        	RET
+                
+ 9033           OVER: 
+ 9033 EF        RST 5
+ 9034           	END
+0007  A                    0000  B                    0001  C             
+02BE  CLEAR                8FEF  CURAD                8FF1  CURDT         
+0002  D                    9027  DELAY                0003  E             
+030E  GTHEX                0004  H                    034F  HXDSP         
+902A  ILOOP                0005  L                    0006  M             
+902A  OLOOP                0389  OUTPUT               9033  OVER          
+03BA  RDKBD                0440  UPDAD                044C  UPDDT         
+
