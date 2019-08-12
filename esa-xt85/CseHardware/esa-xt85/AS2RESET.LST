@@ -1,0 +1,100 @@
+ 0000           cpu "8085.tbl"
+ 0000           hof "int8"
+                
+ 9000           org 9000h
+                
+ 8FF1 =         CURDT: EQU 8FF1H
+ 044C =         UPDDT: EQU 044cH
+ 8FEF =         CURAD: EQU 8FEFH
+ 0440 =         UPDAD: EQU 0440H
+ 0389 =         OUTPUT:EQU 0389H
+                
+                
+ 9000           TIMER:
+ 9000 210000    	LXI H, 0000H
+ 9003 3E99      	MVI A, 99H 
+ 9005 22EF8F    	SHLD CURAD
+ 9008 32F18F    	STA CURDT
+                
+ 900B           NXT_SEC:
+ 900B 2AEF8F    	LHLD CURAD
+ 900E 3AF18F    	LDA CURDT
+ 9011 3C        	INR A
+ 9012 27        	DAA
+ 9013 0660      	MVI B,60H
+ 9015 B8        	CMP B
+ 9016 C23790    	JNZ ONE
+ 9019 3E00      		MVI A, 00H
+ 901B 32F18F    		STA CURDT
+ 901E 7D        		MOV A, L
+ 901F 3C        		INR A
+ 9020 27        		DAA
+ 9021 6F        		MOV L, A
+ 9022 0660      		MVI B,60H
+ 9024 B8        		CMP B
+ 9025 C23A90    		JNZ TWO
+ 9028 2E00      			MVI L, 00H
+ 902A 7C        			MOV A, H
+ 902B 3C        			INR A
+ 902C 27        			DAA
+ 902D 67        			MOV H, A
+ 902E 0612      			MVI B,12H
+ 9030 B8        			CMP B
+ 9031 CA0090    			JZ TIMER
+ 9034 C33A90    			JMP TWO
+                
+ 9037           	ONE:
+ 9037 32F18F    	STA CURDT
+ 903A           	TWO:
+ 903A 22EF8F    	SHLD CURAD
+                
+ 903D 3A4088    	LDA 8840H
+ 9040 47        	MOV B,A
+ 9041 3AF18F    	LDA CURDT
+ 9044 B8        	CMP B
+ 9045 C25C90    	JNZ THREE
+ 9048 2AEF8F    	LHLD CURAD
+ 904B 3A4188    	LDA 8841H
+ 904E BD        	CMP L
+ 904F C25C90    	JNZ THREE
+ 9052 3A4288    	LDA 8842H
+ 9055 BC        	CMP H
+ 9056 C25C90    	JNZ THREE
+                
+ 9059 C30090    	JMP TIMER
+                
+ 905C           	THREE: 
+ 905C CD4C04    	CALL UPDDT
+ 905F CD4004    	CALL UPDAD
+ 9062 CD6B90    	CALL DELAY
+ 9065 C30B90    	JMP NXT_SEC
+                
+                
+ 9068 C37E90    JMP OVER
+                
+ 906B           DELAY:
+ 906B 210F54    	LXI H, 540FH
+ 906E 110400    	LXI D, 0004H
+ 9071           	LOOP1:
+ 9071           		LOOP2:
+ 9071           			LOOP3:
+ 9071 2D        				DCR L
+ 9072 C27190    				JNZ LOOP3
+ 9075 25        			DCR H
+ 9076 C27190    			JNZ LOOP2
+ 9079 1D        		DCR E
+ 907A C27190    		JNZ LOOP1
+ 907D C9        	RET
+                
+ 907E           OVER: 
+ 907E EF        RST 5
+ 907F           	END
+0007  A                    0000  B                    0001  C             
+8FEF  CURAD                8FF1  CURDT                0002  D             
+906B  DELAY                0003  E                    0004  H             
+0005  L                    9071  LOOP1                9071  LOOP2         
+9071  LOOP3                0006  M                    900B  NXT_SEC       
+9037  ONE                  0389  OUTPUT               907E  OVER          
+905C  THREE                9000  TIMER                903A  TWO           
+0440  UPDAD                044C  UPDDT                
+
