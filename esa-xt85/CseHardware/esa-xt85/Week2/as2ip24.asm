@@ -20,7 +20,7 @@ SHLD 8840H
 SHLD 8842H
 
 LXI H,8840H
-CALL OUTPUT
+CALL OUTPUT ; initially display 0000 on address field
 
 MVI A,00H
 MVI B,00H
@@ -34,11 +34,11 @@ FIRST:
 	CPI 24H
 	JC SECOND 
 	
-JMP TIMER
+JMP TIMER ; if invalid input
 
 SECOND:
 	MOV A,L
-	CPI 60H
+	CPI 60H ; check if mm is less than 60
 	SHLD CURAD
 	MVI A,99H
 	STA CURDT
@@ -46,7 +46,7 @@ SECOND:
 	
 JMP TIMER
 
-TIMER:
+TIMER: ; Reset the clock to 00:00:00
 	LXI H, 0000H
 	MVI A, 99H 
 	SHLD CURAD
@@ -57,8 +57,8 @@ TIMER:
 NXT_SEC:
 	LHLD CURAD
 	LDA CURDT
-	INR A
-	DAA
+	INR A ; next second
+	DAA ; increments hex values with 6 to coonvert to decimal
 	CPI 60H
 	JNZ ONE
 		MVI A, 00H
@@ -67,29 +67,30 @@ NXT_SEC:
 		INR A
 		DAA
 		MOV L, A
-		CPI 60H
+		CPI 60H ; compare if minute value has reached 60
 		JNZ TWO
-			MVI L, 00H
+			MVI L, 00H ; if mm=60 change it to 00
 			MOV A, H
 			INR A
 			DAA
 			MOV H, A
-			CPI 24H
-			JZ TIMER
+			CPI 24H ;compare if hh has reached 12
+			JZ TIMER ;compare if hh has reached 12
 			JMP TWO
 
 	ONE:
-	STA CURDT
+	STA CURDT ; store ss at curdt
 	TWO:
-	SHLD CURAD
-	CALL UPDDT
+	SHLD CURAD ;store hh and mm at curad
+	CALL UPDDT ;print function
 	CALL UPDAD
-	CALL DELAY
+	CALL DELAY ; to cause delay of 1 s
 	JMP NXT_SEC
 
 
 JMP OVER
 
+;to cause delay of 1 s
 DELAY:
 	LXI H, 5D0FH
 	LXI D, 0004H

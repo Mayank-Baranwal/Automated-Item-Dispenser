@@ -20,7 +20,7 @@
  900A 224288    SHLD 8842H
                 
  900D 214088    LXI H,8840H
- 9010 CD8903    CALL OUTPUT
+ 9010 CD8903    CALL OUTPUT ; initially display 0000 on address field
                 
  9013 3E00      MVI A,00H
  9015 0600      MVI B,00H
@@ -34,11 +34,11 @@
  901D FE24      	CPI 24H
  901F DA2590    	JC SECOND 
                 	
- 9022 C33690    JMP TIMER
+ 9022 C33690    JMP TIMER ; if invalid input
                 
  9025           SECOND:
  9025 7D        	MOV A,L
- 9026 FE60      	CPI 60H
+ 9026 FE60      	CPI 60H ; check if mm is less than 60
  9028 22EF8F    	SHLD CURAD
  902B 3E99      	MVI A,99H
  902D 32F18F    	STA CURDT
@@ -46,7 +46,7 @@
                 	
  9033 C33690    JMP TIMER
                 
- 9036           TIMER:
+ 9036           TIMER: ; Reset the clock to 00:00:00
  9036 210000    	LXI H, 0000H
  9039 3E99      	MVI A, 99H 
  903B 22EF8F    	SHLD CURAD
@@ -57,8 +57,8 @@
  9041           NXT_SEC:
  9041 2AEF8F    	LHLD CURAD
  9044 3AF18F    	LDA CURDT
- 9047 3C        	INR A
- 9048 27        	DAA
+ 9047 3C        	INR A ; next second
+ 9048 27        	DAA ; increments hex values with 6 to coonvert to decimal
  9049 FE60      	CPI 60H
  904B C26A90    	JNZ ONE
  904E 3E00      		MVI A, 00H
@@ -67,29 +67,30 @@
  9054 3C        		INR A
  9055 27        		DAA
  9056 6F        		MOV L, A
- 9057 FE60      		CPI 60H
+ 9057 FE60      		CPI 60H ; compare if minute value has reached 60
  9059 C26D90    		JNZ TWO
- 905C 2E00      			MVI L, 00H
+ 905C 2E00      			MVI L, 00H ; if mm=60 change it to 00
  905E 7C        			MOV A, H
  905F 3C        			INR A
  9060 27        			DAA
  9061 67        			MOV H, A
- 9062 FE24      			CPI 24H
- 9064 CA3690    			JZ TIMER
+ 9062 FE24      			CPI 24H ;compare if hh has reached 12
+ 9064 CA3690    			JZ TIMER ;compare if hh has reached 12
  9067 C36D90    			JMP TWO
                 
  906A           	ONE:
- 906A 32F18F    	STA CURDT
+ 906A 32F18F    	STA CURDT ; store ss at curdt
  906D           	TWO:
- 906D 22EF8F    	SHLD CURAD
- 9070 CD4C04    	CALL UPDDT
+ 906D 22EF8F    	SHLD CURAD ;store hh and mm at curad
+ 9070 CD4C04    	CALL UPDDT ;print function
  9073 CD4004    	CALL UPDAD
- 9076 CD7F90    	CALL DELAY
+ 9076 CD7F90    	CALL DELAY ; to cause delay of 1 s
  9079 C34190    	JMP NXT_SEC
                 
                 
  907C C39290    JMP OVER
                 
+                ;to cause delay of 1 s
  907F           DELAY:
  907F 210F5D    	LXI H, 5D0FH
  9082 110400    	LXI D, 0004H

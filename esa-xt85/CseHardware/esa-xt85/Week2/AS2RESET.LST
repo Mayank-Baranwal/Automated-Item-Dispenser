@@ -10,20 +10,20 @@
  0389 =         OUTPUT:EQU 0389H
                 
                 
- 9000           TIMER:
+ 9000           TIMER: ; Reset the clock to 00:00 ; 
  9000 210000    	LXI H, 0000H
  9003 3E99      	MVI A, 99H 
  9005 22EF8F    	SHLD CURAD
  9008 32F18F    	STA CURDT
                 
- 900B           NXT_SEC:
+ 900B           NXT_SEC: ; Increment the time by 1s ; 
  900B 2AEF8F    	LHLD CURAD
  900E 3AF18F    	LDA CURDT
  9011 3C        	INR A
  9012 27        	DAA
  9013 0660      	MVI B,60H
  9015 B8        	CMP B
- 9016 C23790    	JNZ ONE
+ 9016 C23790    	JNZ ONE ; If Seconds == 60 increment Minutes ;  
  9019 3E00      		MVI A, 00H
  901B 32F18F    		STA CURDT
  901E 7D        		MOV A, L
@@ -32,14 +32,14 @@
  9021 6F        		MOV L, A
  9022 0660      		MVI B,60H
  9024 B8        		CMP B
- 9025 C23A90    		JNZ TWO
+ 9025 C23A90    		JNZ TWO ; If Minutes == 60 increment Hours ; 
  9028 2E00      			MVI L, 00H
  902A 7C        			MOV A, H
  902B 3C        			INR A
  902C 27        			DAA
  902D 67        			MOV H, A
  902E 0612      			MVI B,12H
- 9030 B8        			CMP B
+ 9030 B8        			CMP B ; If Hours == 12 Reset to 0 ; 
  9031 CA0090    			JZ TIMER
  9034 C33A90    			JMP TWO
                 
@@ -48,20 +48,20 @@
  903A           	TWO:
  903A 22EF8F    	SHLD CURAD
                 
- 903D 3A4088    	LDA 8840H
+ 903D 3A4088    	LDA 8840H ; load ss of alarm
  9040 47        	MOV B,A
  9041 3AF18F    	LDA CURDT
  9044 B8        	CMP B
- 9045 C25C90    	JNZ THREE
- 9048 2AEF8F    	LHLD CURAD
- 904B 3A4188    	LDA 8841H
- 904E BD        	CMP L
- 904F C25C90    	JNZ THREE
- 9052 3A4288    	LDA 8842H
- 9055 BC        	CMP H
- 9056 C25C90    	JNZ THREE
+ 9045 C25C90    	JNZ THREE ; if ss not equal move normally
+ 9048 2AEF8F    	LHLD CURAD 
+ 904B 3A4188    	LDA 8841H ; load mm of alarm
+ 904E BD        	CMP L 
+ 904F C25C90    	JNZ THREE ; if mm not equal move normally
+ 9052 3A4288    	LDA 8842H ; load hh of alarm
+ 9055 BC        	CMP H 
+ 9056 C25C90    	JNZ THREE ; if hh not equal move normally
                 
- 9059 C30090    	JMP TIMER
+ 9059 C30090    	JMP TIMER ; if alarm reached reset clock
                 
  905C           	THREE: 
  905C CD4C04    	CALL UPDDT
@@ -72,7 +72,7 @@
                 
  9068 C37E90    JMP OVER
                 
- 906B           DELAY:
+ 906B           DELAY: ; Delay the clock by 1s ; 
  906B 210F54    	LXI H, 540FH
  906E 110400    	LXI D, 0004H
  9071           	LOOP1:

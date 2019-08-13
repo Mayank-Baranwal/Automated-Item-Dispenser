@@ -21,8 +21,8 @@ TIMER:
 NXT_SEC:
 	LHLD CURAD
 	LDA CURDT
-	INR A
-	DAA
+	INR A ;next second
+	DAA ; increments hex values with 6 to coonvert to decimal
 	MVI B,60H
 	CMP B
 	JNZ ONE
@@ -32,60 +32,60 @@ NXT_SEC:
 		INR A
 		DAA
 		MOV L, A
-		MVI B,60H
+		MVI B,60H ; compare if minute value has reached 60
 		CMP B
 		JNZ TWO
-			MVI L, 00H
+			MVI L, 00H ; if mm=60 change it to 00
 			MOV A, H
 			INR A
 			DAA
 			MOV H, A
-			MVI B,12H
+			MVI B,12H ;compare if hh has reached 12
 			CMP B
-			JZ TIMER
+			JZ TIMER ;compare if hh has reached 12
 			JMP TWO
 
 	ONE:
-	STA CURDT
+	STA CURDT ; store ss at curdt
 	TWO:
-	SHLD CURAD
-	LDA 8840H
+	SHLD CURAD ;store hh and mm at curad
+	LDA 8840H ;find count of alarms
 	JZ THREE
 	MOV C,A
 	LXI D,8840H
 	FOUR:
 
-	INX D
+	INX D ;fetch alarm seconds
 	XCHG
 	MOV B,M
 	XCHG
 	LDA CURDT
-	CMP B
-	JZ LOL1
+	CMP B	;compare alarm secs with current secs
+	JZ TEMP1
 	INX D
 	INX D
 	JMP FIVE
 
-	LOL1:
-	INX D
+	TEMP1:
+	INX D ;fetch alarm minute
 	XCHG
 	MOV B,M
 	XCHG
 	LHLD CURAD
 	MOV A,L
-	CMP B
-	JZ LOL2
+	CMP B ;compare alarm secs with current minute
+	JZ TEMP2
 	INX D
 	JMP FIVE
 
-	LOL2:
-	INX D
+	TEMP2:
+	INX D ;fetch alarm hour
 	XCHG
 	MOV B,M
 	XCHG
 	LHLD CURAD
 	MOV A,H
-	CMP B
+	CMP B ;compare alarm secs with current hour
 	JNZ FIVE
 
 	LDA CURDT
@@ -96,9 +96,9 @@ NXT_SEC:
 	LXI H,0ABCDH
 	STA CURDT
 	SHLD CURAD
-	CALL UPDDT
+	CALL UPDDT ;print function
 	CALL UPDAD
-	CALL DELAY
+	CALL DELAY ; to cause delay of 1 s
 	LDA 8900H
 	LHLD 8901H
 

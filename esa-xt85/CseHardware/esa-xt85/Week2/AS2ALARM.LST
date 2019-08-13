@@ -21,8 +21,8 @@
  9011           NXT_SEC:
  9011 2AEF8F    	LHLD CURAD
  9014 3AF18F    	LDA CURDT
- 9017 3C        	INR A
- 9018 27        	DAA
+ 9017 3C        	INR A ;next second
+ 9018 27        	DAA ; increments hex values with 6 to coonvert to decimal
  9019 0660      	MVI B,60H
  901B B8        	CMP B
  901C C23D90    	JNZ ONE
@@ -32,73 +32,73 @@
  9025 3C        		INR A
  9026 27        		DAA
  9027 6F        		MOV L, A
- 9028 0660      		MVI B,60H
+ 9028 0660      		MVI B,60H ; compare if minute value has reached 60
  902A B8        		CMP B
  902B C24090    		JNZ TWO
- 902E 2E00      			MVI L, 00H
+ 902E 2E00      			MVI L, 00H ; if mm=60 change it to 00
  9030 7C        			MOV A, H
  9031 3C        			INR A
  9032 27        			DAA
  9033 67        			MOV H, A
- 9034 0612      			MVI B,12H
+ 9034 0612      			MVI B,12H ;compare if hh has reached 12
  9036 B8        			CMP B
- 9037 CA0690    			JZ TIMER
+ 9037 CA0690    			JZ TIMER ;compare if hh has reached 12
  903A C34090    			JMP TWO
                 
  903D           	ONE:
- 903D 32F18F    	STA CURDT
+ 903D 32F18F    	STA CURDT ; store ss at curdt
  9040           	TWO:
- 9040 22EF8F    	SHLD CURAD
- 9043 3A4088    	LDA 8840H
+ 9040 22EF8F    	SHLD CURAD ;store hh and mm at curad
+ 9043 3A4088    	LDA 8840H ;find count of alarms
  9046 CAAC90    	JZ THREE
  9049 4F        	MOV C,A
  904A 114088    	LXI D,8840H
  904D           	FOUR:
                 
- 904D 13        	INX D
+ 904D 13        	INX D ;fetch alarm seconds
  904E EB        	XCHG
  904F 46        	MOV B,M
  9050 EB        	XCHG
  9051 3AF18F    	LDA CURDT
- 9054 B8        	CMP B
- 9055 CA5D90    	JZ LOL1
+ 9054 B8        	CMP B	;compare alarm secs with current secs
+ 9055 CA5D90    	JZ TEMP1
  9058 13        	INX D
  9059 13        	INX D
  905A C3A890    	JMP FIVE
                 
- 905D           	LOL1:
- 905D 13        	INX D
+ 905D           	TEMP1:
+ 905D 13        	INX D ;fetch alarm minute
  905E EB        	XCHG
  905F 46        	MOV B,M
  9060 EB        	XCHG
  9061 2AEF8F    	LHLD CURAD
  9064 7D        	MOV A,L
- 9065 B8        	CMP B
- 9066 CA6D90    	JZ LOL2
+ 9065 B8        	CMP B ;compare alarm secs with current minute
+ 9066 CA6D90    	JZ TEMP2
  9069 13        	INX D
  906A C3A890    	JMP FIVE
                 
- 906D           	LOL2:
- 906D 13        	INX D
+ 906D           	TEMP2:
+ 906D 13        	INX D ;fetch alarm hour
  906E EB        	XCHG
  906F 46        	MOV B,M
  9070 EB        	XCHG
  9071 2AEF8F    	LHLD CURAD
  9074 7C        	MOV A,H
- 9075 B8        	CMP B
+ 9075 B8        	CMP B ;compare alarm secs with current hour
  9076 C2A890    	JNZ FIVE
                 
  9079 3AF18F    	LDA CURDT
  907C 320089    	STA 8900H
  907F 2AEF8F    	LHLD CURAD
  9082 220189    	SHLD 8901H
- 9085 3EFF      	MVI A,0FFH
- 9087 21FFFF    	LXI H,0FFFFH
+ 9085 3EEF      	MVI A,0EFH
+ 9087 21CDAB    	LXI H,0ABCDH
  908A 32F18F    	STA CURDT
  908D 22EF8F    	SHLD CURAD
- 9090 CD4C04    	CALL UPDDT
+ 9090 CD4C04    	CALL UPDDT ;print function
  9093 CD4004    	CALL UPDAD
- 9096 CDBB90    	CALL DELAY
+ 9096 CDBB90    	CALL DELAY ; to cause delay of 1 s
  9099 3A0089    	LDA 8900H
  909C 2A0189    	LHLD 8901H
                 
@@ -143,9 +143,9 @@
 8FEF  CURAD                8FF1  CURDT                0002  D             
 90BB  DELAY                0003  E                    90A8  FIVE          
 904D  FOUR                 0004  H                    0005  L             
-905D  LOL1                 906D  LOL2                 90C1  LOOP1         
-90C1  LOOP2                90C1  LOOP3                0006  M             
-9011  NXT_SEC              903D  ONE                  0389  OUTPUT        
-90CE  OVER                 90AC  THREE                9006  TIMER         
+90C1  LOOP1                90C1  LOOP2                90C1  LOOP3         
+0006  M                    9011  NXT_SEC              903D  ONE           
+0389  OUTPUT               90CE  OVER                 905D  TEMP1         
+906D  TEMP2                90AC  THREE                9006  TIMER         
 9040  TWO                  0440  UPDAD                044C  UPDDT         
 
