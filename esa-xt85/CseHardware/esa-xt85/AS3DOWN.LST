@@ -1,0 +1,151 @@
+ 0000           cpu "8085.tbl"
+ 0000           hof "int8"
+                
+ 9000           org 9000h
+                
+ 030E =         GTHEX: EQU 030EH    		;Gets hex digits and displays them
+ 034F =         HXDSP: EQU 034FH			;Expands hex digits for display
+ 0389 =         OUTPUT:EQU 0389H			;Outputs characters to display
+ 02BE =         CLEAR: EQU 02BEH			;Clears the display
+ 03BA =         RDKBD: EQU 03BAH			;Reads keyboard
+ 003C =         KBINT: EQU 3CH	
+                
+ 8FF1 =         CURDT: EQU 8FF1H
+ 044C =         UPDDT: EQU 044cH
+ 8FEF =         CURAD: EQU 8FEFH
+ 0440 =         UPDAD: EQU 0440H
+                
+                
+ 9000 3E0B      MVI A, 0BH
+ 9002 30        SIM
+ 9003 FB        EI
+                
+ 9004 3E00      MVI A,00H
+ 9006 0600      MVI B,00H
+                
+                
+ 9008 210000    LXI H,0000H
+ 900B 224088    SHLD 8840H
+ 900E 224288    SHLD 8842H
+                
+ 9011 214088    LXI H,8840H
+ 9014 CD8903    CALL OUTPUT ; initially display 0000 on address field
+                
+ 9017 3E00      MVI A,00H
+ 9019 0600      MVI B,00H
+ 901B CD0E03    CALL GTHEX ; Taking input into D-E pair
+ 901E 62        MOV H,D
+ 901F 6B        MOV L,E
+                
+                ;Checking for valid input
+ 9020           FIRST:
+ 9020 7C        	MOV A,H
+ 9021 FE12      	CPI 12H ;check if hh is less than 12
+ 9023 DA2990    	JC SECOND 
+                	
+ 9026 C33A90    JMP TIMER ; if invalid input
+                
+ 9029           SECOND:
+ 9029 7D        	MOV A,L
+ 902A FE60      	CPI 60H ; check if mm is less than 60 
+ 902C 22EF8F    	SHLD CURAD
+ 902F 3E60      	MVI A,60H
+ 9031 32F18F    	STA CURDT
+ 9034 DA4590    	JC NXT_SEC
+                	
+ 9037 C33A90    JMP TIMER
+                
+ 903A           TIMER:
+ 903A 215911    	LXI H, 1159H
+ 903D 3E60      	MVI A, 60H 
+ 903F 22EF8F    	SHLD CURAD
+ 9042 32F18F    	STA CURDT
+                
+                
+                
+ 9045           NXT_SEC:
+ 9045 2AEF8F    	LHLD CURAD
+ 9048 3AF18F    	LDA CURDT
+ 904B CDA190    	CALL SUBTRACT_FUNCTION
+ 904E FEF9      	CPI 0F9H
+ 9050 C27190    	JNZ ONE
+ 9053 3E59      		MVI A, 59H
+ 9055 32F18F    		STA CURDT
+ 9058 7D        		MOV A, L
+ 9059 CDA190    		CALL SUBTRACT_FUNCTION
+ 905C 6F        		MOV L, A
+ 905D FEF9      		CPI 0F9H ; compare if minute value has reached 60
+ 905F C27490    		JNZ TWO
+ 9062 2E59      			MVI L, 59H ; if mm=60 change it to 00
+ 9064 7C        			MOV A, H
+ 9065 CDA190    			CALL SUBTRACT_FUNCTION
+ 9068 67        			MOV H, A
+ 9069 FEF9      			CPI 0F9H ;compare if hh has reached 12
+ 906B CAA090    			JZ OVER ;compare if hh has reached 12
+ 906E C37490    			JMP TWO
+                
+ 9071           	ONE:
+ 9071 32F18F    	STA CURDT ; store ss at curdt
+ 9074           	TWO:
+ 9074 22EF8F    	SHLD CURAD ;store hh and mm at curad
+ 9077 CD4C04    	CALL UPDDT ;print function
+ 907A CD4004    	CALL UPDAD
+ 907D CD8D90    	CALL DELAY ; to cause delay of 1 s
+ 9080 C34590    	JMP NXT_SEC
+                
+                
+ 9083 C3A090    JMP OVER
+                
+ 9086 F5        PUSH PSW
+ 9087 CDBA03    CALL RDKBD
+ 908A F1        POP PSW
+ 908B FB        EI
+ 908C C9        RET
+                
+                ;to cause delay of 1 s
+ 908D           DELAY:
+ 908D 210F5D    	LXI H, 5D0FH
+ 9090 110400    	LXI D, 0004H
+ 9093           	LOOP1:
+ 9093           		LOOP2:
+ 9093           			LOOP3:
+ 9093 2D        				DCR L
+ 9094 C29390    				JNZ LOOP3
+ 9097 25        			DCR H
+ 9098 C29390    			JNZ LOOP2
+ 909B 1D        		DCR E
+ 909C C29390    		JNZ LOOP1
+ 909F C9        	RET
+                
+ 90A0           OVER: 
+ 90A0 EF        RST 5
+                
+                
+ 90A1           SUBTRACT_FUNCTION:						;bcd subtractor 
+ 90A1 320282     STA 8202H
+ 90A4 E60F       ANI 0FH
+ 90A6 FE00       CPI 00H
+ 90A8 CAB090     JZ SUBTRACT_HELPER
+ 90AB 3A0282     LDA 8202H
+ 90AE 3D         DCR A
+ 90AF C9         RET
+ 90B0            SUBTRACT_HELPER:
+ 90B0 3A0282     LDA 8202H
+ 90B3 DE07       SBI 07H
+ 90B5 C9         RET
+                
+                
+                
+                	END
+0007  A                    0000  B                    0001  C             
+02BE  CLEAR                8FEF  CURAD                8FF1  CURDT         
+0002  D                    908D  DELAY                0003  E             
+9020  FIRST                030E  GTHEX                0004  H             
+034F  HXDSP                003C  KBINT                0005  L             
+9093  LOOP1                9093  LOOP2                9093  LOOP3         
+0006  M                    9045  NXT_SEC              9071  ONE           
+0389  OUTPUT               90A0  OVER                 03BA  RDKBD         
+9029  SECOND               90A1  SUBTRACT_FUNCTION    90B0  SUBTRACT_HELPER
+903A  TIMER                9074  TWO                  0440  UPDAD         
+044C  UPDDT                
+

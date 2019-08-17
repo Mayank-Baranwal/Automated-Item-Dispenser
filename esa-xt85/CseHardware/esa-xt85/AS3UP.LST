@@ -1,0 +1,140 @@
+ 0000           cpu "8085.tbl"
+ 0000           hof "int8"
+                
+ 9000           org 9000h
+                
+ 030E =         GTHEX: EQU 030EH    		;Gets hex digits and displays them
+ 034F =         HXDSP: EQU 034FH			;Expands hex digits for display
+ 0389 =         OUTPUT:EQU 0389H			;Outputs characters to display
+ 02BE =         CLEAR: EQU 02BEH			;Clears the display
+ 03BA =         RDKBD: EQU 03BAH			;Reads keyboard
+ 003C =         KBINT: EQU 3CH	
+                
+ 8FF1 =         CURDT: EQU 8FF1H
+ 044C =         UPDDT: EQU 044cH
+ 8FEF =         CURAD: EQU 8FEFH
+ 0440 =         UPDAD: EQU 0440H
+                
+                
+ 9000 3E0B      MVI A, 0BH
+ 9002 30        SIM
+ 9003 FB        EI
+                
+ 9004 3E00      MVI A,00H
+ 9006 0600      MVI B,00H
+                
+                
+ 9008 210000    LXI H,0000H
+ 900B 224088    SHLD 8840H
+ 900E 224288    SHLD 8842H
+                
+ 9011 214088    LXI H,8840H
+ 9014 CD8903    CALL OUTPUT ; initially display 0000 on address field
+                
+ 9017 3E00      MVI A,00H
+ 9019 0600      MVI B,00H
+ 901B CD0E03    CALL GTHEX ; Taking input into D-E pair
+ 901E 62        MOV H,D
+ 901F 6B        MOV L,E
+                
+                ;Checking for valid input
+ 9020           FIRST:
+ 9020 7C        	MOV A,H
+ 9021 FE12      	CPI 12H ;check if hh is less than 12
+ 9023 DA2990    	JC SECOND 
+                	
+ 9026 C33A90    JMP TIMER ; if invalid input
+                
+ 9029           SECOND:
+ 9029 7D        	MOV A,L
+ 902A FE60      	CPI 60H ; check if mm is less than 60 
+ 902C 22EF8F    	SHLD CURAD
+ 902F 3E99      	MVI A,99H
+ 9031 32F18F    	STA CURDT
+ 9034 DA4590    	JC NXT_SEC
+                	
+ 9037 C33A90    JMP TIMER
+                
+ 903A           TIMER:
+ 903A 210000    	LXI H, 0000H
+ 903D 3E99      	MVI A, 99H 
+ 903F 22EF8F    	SHLD CURAD
+ 9042 32F18F    	STA CURDT
+                
+                
+                
+ 9045           NXT_SEC:
+ 9045 2AEF8F    	LHLD CURAD
+ 9048 3AF18F    	LDA CURDT
+ 904B 3C        	INR A ;next second
+ 904C 27        	DAA ; increments hex values with 6 to coonvert to decimal
+ 904D FE60      	CPI 60H
+ 904F C26E90    	JNZ ONE
+ 9052 3E00      		MVI A, 00H
+ 9054 32F18F    		STA CURDT
+ 9057 7D        		MOV A, L
+ 9058 3C        		INR A
+ 9059 27        		DAA
+ 905A 6F        		MOV L, A
+ 905B FE60      		CPI 60H ; compare if minute value has reached 60
+ 905D C27190    		JNZ TWO
+ 9060 2E00      			MVI L, 00H ; if mm=60 change it to 00
+ 9062 7C        			MOV A, H
+ 9063 3C        			INR A
+ 9064 27        			DAA
+ 9065 67        			MOV H, A
+ 9066 FE12      			CPI 12H ;compare if hh has reached 12
+ 9068 CA3A90    			JZ TIMER ;compare if hh has reached 12
+ 906B C37190    			JMP TWO
+                
+ 906E           	ONE:
+ 906E 32F18F    	STA CURDT ; store ss at curdt
+ 9071           	TWO:
+ 9071 22EF8F    	SHLD CURAD ;store hh and mm at curad
+ 9074 CD4C04    	CALL UPDDT ;print function
+ 9077 CD4004    	CALL UPDAD
+ 907A CD8A90    	CALL DELAY ; to cause delay of 1 s
+ 907D C34590    	JMP NXT_SEC
+                
+                
+ 9080 C39D90    JMP OVER
+                
+ 9083 F5        PUSH PSW
+ 9084 CDBA03    CALL RDKBD
+ 9087 F1        POP PSW
+ 9088 FB        EI
+ 9089 C9        RET
+                
+                ;to cause delay of 1 s
+ 908A           DELAY:
+ 908A 210F5D    	LXI H, 5D0FH
+ 908D 110400    	LXI D, 0004H
+ 9090           	LOOP1:
+ 9090           		LOOP2:
+ 9090           			LOOP3:
+ 9090 2D        				DCR L
+ 9091 C29090    				JNZ LOOP3
+ 9094 25        			DCR H
+ 9095 C29090    			JNZ LOOP2
+ 9098 1D        		DCR E
+ 9099 C29090    		JNZ LOOP1
+ 909C C9        	RET
+                
+ 909D           OVER: 
+ 909D EF        RST 5
+                
+                
+                
+                
+                	END
+0007  A                    0000  B                    0001  C             
+02BE  CLEAR                8FEF  CURAD                8FF1  CURDT         
+0002  D                    908A  DELAY                0003  E             
+9020  FIRST                030E  GTHEX                0004  H             
+034F  HXDSP                003C  KBINT                0005  L             
+9090  LOOP1                9090  LOOP2                9090  LOOP3         
+0006  M                    9045  NXT_SEC              906E  ONE           
+0389  OUTPUT               909D  OVER                 03BA  RDKBD         
+9029  SECOND               903A  TIMER                9071  TWO           
+0440  UPDAD                044C  UPDDT                
+
