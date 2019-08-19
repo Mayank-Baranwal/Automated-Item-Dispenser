@@ -16,112 +16,149 @@
  0440 =         UPDAD: EQU 0440H
                 
                 
- 9000 3E0B      MVI A, 0BH
- 9002 30        SIM
- 9003 FB        EI
+ 9000 210288    LXI H,8802H
+ 9003 220088    SHLD 8800H
+ 9006 210000    LXI H,0000H
+ 9009 220089    SHLD 8900H
                 
- 9004 3E00      MVI A,00H
- 9006 0600      MVI B,00H
+ 900C 3E0B      MVI A, 0BH
+ 900E 30        SIM
+ 900F FB        EI
+                
+ 9010 3E00      MVI A,00H
+ 9012 0600      MVI B,00H
                 
                 
- 9008 210000    LXI H,0000H
- 900B 224088    SHLD 8840H
- 900E 224288    SHLD 8842H
+ 9014 210000    LXI H,0000H
+ 9017 224088    SHLD 8840H
+ 901A 224288    SHLD 8842H
                 
- 9011 214088    LXI H,8840H
- 9014 CD8903    CALL OUTPUT ; initially display 0000 on address field
+ 901D 214088    LXI H,8840H
+ 9020 CD8903    CALL OUTPUT ; initially display 0000 on address field
                 
- 9017 3E00      MVI A,00H
- 9019 0600      MVI B,00H
- 901B CD0E03    CALL GTHEX ; Taking input into D-E pair
- 901E 62        MOV H,D
- 901F 6B        MOV L,E
+ 9023 3E00      MVI A,00H
+ 9025 0600      MVI B,00H
+ 9027 CD0E03    CALL GTHEX ; Taking input into D-E pair
+ 902A 62        MOV H,D
+ 902B 6B        MOV L,E
                 
                 ;Checking for valid input
- 9020           FIRST:
- 9020 7C        	MOV A,H
- 9021 FE12      	CPI 12H ;check if hh is less than 12
- 9023 DA2990    	JC SECOND 
+ 902C           FIRST:
+ 902C 7C        	MOV A,H
+ 902D FE12      	CPI 12H ;check if hh is less than 12
+ 902F DA3590    	JC SECOND 
                 	
- 9026 C33A90    JMP TIMER ; if invalid input
+ 9032 C34690    JMP TIMER ; if invalid input
                 
- 9029           SECOND:
- 9029 7D        	MOV A,L
- 902A FE60      	CPI 60H ; check if mm is less than 60 
- 902C 22EF8F    	SHLD CURAD
- 902F 3E99      	MVI A,99H
- 9031 32F18F    	STA CURDT
- 9034 DA4590    	JC NXT_SEC
+ 9035           SECOND:
+ 9035 7D        	MOV A,L
+ 9036 FE60      	CPI 60H ; check if mm is less than 60 
+ 9038 22EF8F    	SHLD CURAD
+ 903B 3E99      	MVI A,99H
+ 903D 32F18F    	STA CURDT
+ 9040 DA5190    	JC NXT_SEC
                 	
- 9037 C33A90    JMP TIMER
+ 9043 C34690    JMP TIMER
                 
- 903A           TIMER:
- 903A 210000    	LXI H, 0000H
- 903D 3E99      	MVI A, 99H 
- 903F 22EF8F    	SHLD CURAD
- 9042 32F18F    	STA CURDT
-                
-                
-                
- 9045           NXT_SEC:
- 9045 2AEF8F    	LHLD CURAD
- 9048 3AF18F    	LDA CURDT
- 904B 3C        	INR A ;next second
- 904C 27        	DAA ; increments hex values with 6 to coonvert to decimal
- 904D FE60      	CPI 60H
- 904F C26E90    	JNZ ONE
- 9052 3E00      		MVI A, 00H
- 9054 32F18F    		STA CURDT
- 9057 7D        		MOV A, L
- 9058 3C        		INR A
- 9059 27        		DAA
- 905A 6F        		MOV L, A
- 905B FE60      		CPI 60H ; compare if minute value has reached 60
- 905D C27190    		JNZ TWO
- 9060 2E00      			MVI L, 00H ; if mm=60 change it to 00
- 9062 7C        			MOV A, H
- 9063 3C        			INR A
- 9064 27        			DAA
- 9065 67        			MOV H, A
- 9066 FE12      			CPI 12H ;compare if hh has reached 12
- 9068 CA3A90    			JZ TIMER ;compare if hh has reached 12
- 906B C37190    			JMP TWO
-                
- 906E           	ONE:
- 906E 32F18F    	STA CURDT ; store ss at curdt
- 9071           	TWO:
- 9071 22EF8F    	SHLD CURAD ;store hh and mm at curad
- 9074 CD4C04    	CALL UPDDT ;print function
- 9077 CD4004    	CALL UPDAD
- 907A CD8A90    	CALL DELAY ; to cause delay of 1 s
- 907D C34590    	JMP NXT_SEC
+ 9046           TIMER:
+ 9046 210000    	LXI H, 0000H
+ 9049 3E99      	MVI A, 99H 
+ 904B 22EF8F    	SHLD CURAD
+ 904E 32F18F    	STA CURDT
                 
                 
- 9080 C39D90    JMP OVER
                 
- 9083 F5        PUSH PSW
- 9084 CDBA03    CALL RDKBD
- 9087 F1        POP PSW
- 9088 FB        EI
- 9089 C9        RET
+ 9051           NXT_SEC:
+ 9051 2AEF8F    	LHLD CURAD
+ 9054 3AF18F    	LDA CURDT
+ 9057 3C        	INR A ;next second
+ 9058 27        	DAA ; increments hex values with 6 to coonvert to decimal
+ 9059 FE60      	CPI 60H
+ 905B C27A90    	JNZ ONE
+ 905E 3E00      		MVI A, 00H
+ 9060 32F18F    		STA CURDT
+ 9063 7D        		MOV A, L
+ 9064 3C        		INR A
+ 9065 27        		DAA
+ 9066 6F        		MOV L, A
+ 9067 FE60      		CPI 60H ; compare if minute value has reached 60
+ 9069 C27D90    		JNZ TWO
+ 906C 2E00      			MVI L, 00H ; if mm=60 change it to 00
+ 906E 7C        			MOV A, H
+ 906F 3C        			INR A
+ 9070 27        			DAA
+ 9071 67        			MOV H, A
+ 9072 FE12      			CPI 12H ;compare if hh has reached 12
+ 9074 CA4690    			JZ TIMER ;compare if hh has reached 12
+ 9077 C37D90    			JMP TWO
+                
+ 907A           	ONE:
+ 907A 32F18F    	STA CURDT ; store ss at curdt
+ 907D           	TWO:
+ 907D 22EF8F    	SHLD CURAD ;store hh and mm at curad
+ 9080 CD4C04    	CALL UPDDT ;print function
+ 9083 CD4004    	CALL UPDAD
+ 9086 CDC390    	CALL DELAY ; to cause delay of 1 s
+ 9089 C35190    	JMP NXT_SEC
+                
+                
+ 908C C3D690    JMP OVER
+                
+ 908F F5        PUSH PSW
+ 9090 E5        PUSH H
+ 9091 57        MOV D,A
+ 9092 D5        PUSH D
+                
+ 9093 3A0089    LDA 8900H
+ 9096 FE00      CPI 00H
+ 9098 C2B090    JNZ LBL
+                
+ 909B 2A0088    LHLD 8800H
+ 909E 3AF18F    LDA CURDT
+ 90A1 77        MOV M,A
+ 90A2 23        INX H
+ 90A3 3AEF8F    LDA 8FEFH
+ 90A6 77        MOV M,A
+ 90A7 23        INX H
+ 90A8 3AF08F    LDA 8FF0H
+ 90AB 77        MOV M,A
+ 90AC 23        INX H
+ 90AD 220088    SHLD 8800H
+                
+                
+                
+ 90B0           LBL:
+ 90B0 3A0089    LDA 8900H
+ 90B3 EE01      XRI 01H
+ 90B5 320089    STA 8900H
+                
+ 90B8 CDBA03    CALL RDKBD
+                
+ 90BB D1        POP D
+ 90BC 7A        MOV A,D
+ 90BD E1        POP H
+ 90BE 1600      MVI D,00H
+ 90C0 F1        POP PSW
+ 90C1 FB        EI
+ 90C2 C9        RET
                 
                 ;to cause delay of 1 s
- 908A           DELAY:
- 908A 210F5D    	LXI H, 5D0FH
- 908D 110400    	LXI D, 0004H
- 9090           	LOOP1:
- 9090           		LOOP2:
- 9090           			LOOP3:
- 9090 2D        				DCR L
- 9091 C29090    				JNZ LOOP3
- 9094 25        			DCR H
- 9095 C29090    			JNZ LOOP2
- 9098 1D        		DCR E
- 9099 C29090    		JNZ LOOP1
- 909C C9        	RET
+ 90C3           DELAY:
+ 90C3 210F5D    	LXI H, 5D0FH
+ 90C6 110400    	LXI D, 0004H
+ 90C9           	LOOP1:
+ 90C9           		LOOP2:
+ 90C9           			LOOP3:
+ 90C9 2D        				DCR L
+ 90CA C2C990    				JNZ LOOP3
+ 90CD 25        			DCR H
+ 90CE C2C990    			JNZ LOOP2
+ 90D1 1D        		DCR E
+ 90D2 C2C990    		JNZ LOOP1
+ 90D5 C9        	RET
                 
- 909D           OVER: 
- 909D EF        RST 5
+ 90D6           OVER: 
+ 90D6 EF        RST 5
                 
                 
                 
@@ -129,12 +166,12 @@
                 	END
 0007  A                    0000  B                    0001  C             
 02BE  CLEAR                8FEF  CURAD                8FF1  CURDT         
-0002  D                    908A  DELAY                0003  E             
-9020  FIRST                030E  GTHEX                0004  H             
+0002  D                    90C3  DELAY                0003  E             
+902C  FIRST                030E  GTHEX                0004  H             
 034F  HXDSP                003C  KBINT                0005  L             
-9090  LOOP1                9090  LOOP2                9090  LOOP3         
-0006  M                    9045  NXT_SEC              906E  ONE           
-0389  OUTPUT               909D  OVER                 03BA  RDKBD         
-9029  SECOND               903A  TIMER                9071  TWO           
-0440  UPDAD                044C  UPDDT                
+90B0  LBL                  90C9  LOOP1                90C9  LOOP2         
+90C9  LOOP3                0006  M                    9051  NXT_SEC       
+907A  ONE                  0389  OUTPUT               90D6  OVER          
+03BA  RDKBD                9035  SECOND               9046  TIMER         
+907D  TWO                  0440  UPDAD                044C  UPDDT         
 

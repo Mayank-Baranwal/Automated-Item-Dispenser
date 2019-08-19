@@ -16,12 +16,6 @@ CURAD: EQU 8FEFH
 UPDAD: EQU 0440H
 
 
-LXI H,8802H
-SHLD 8800H
-LXI H,0000H
-SHLD 8900H
-
-
 MVI A, 0BH
 SIM
 EI
@@ -46,7 +40,7 @@ MOV L,E
 ;Checking for valid input
 FIRST:
 	MOV A,H
-	CPI 12H ;check if hh is less than 12
+	CPI 24H ;check if hh is less than 24
 	JC SECOND 
 	
 JMP TIMER ; if invalid input
@@ -62,7 +56,7 @@ SECOND:
 JMP TIMER
 
 TIMER:
-	LXI H, 1159H
+	LXI H, 2359H
 	MVI A, 60H 
 	SHLD CURAD
 	STA CURDT
@@ -86,8 +80,8 @@ NXT_SEC:
 			MOV A, H
 			CALL SUBTRACT_FUNCTION
 			MOV H, A
-			CPI 0F9H ;compare if hh has reached 12
-			JZ OVER ;compare if hh has reached 12
+			CPI 0F9H ;compare if hh has reached 24
+			JZ OVER ;compare if hh has reached 24
 			JMP TWO
 
 	ONE:
@@ -103,39 +97,7 @@ NXT_SEC:
 JMP OVER
 
 PUSH PSW
-PUSH H
-MOV D,A
-PUSH D
-
-LDA 8900H
-CPI 00H
-JNZ LBL
-
-LHLD 8800H
-LDA CURDT
-MOV M,A
-INX H
-LDA 8FEFH
-MOV M,A
-INX H
-LDA 8FF0H
-MOV M,A
-INX H
-SHLD 8800H
-
-
-
-LBL:
-LDA 8900H
-XRI 01H
-STA 8900H
-
 CALL RDKBD
-
-POP D
-MOV A,D
-POP H
-MVI D,00H
 POP PSW
 EI
 RET
