@@ -1,17 +1,19 @@
  0000           cpu "8085.tbl"
  0000           hof "int8"
                 
- 9000           org 9000h
+ 9000           org 9000h 
                 
- 9000 3E10      mvi a,10h
- 9002 0620      mvi b,20h
- 9004 80        add b
- 9005 EF        RST 5
+ 9000 3E8B      MVI A, 8BH
+ 9002 D343      OUT 43H
+ 9004           SEN:
+ 9004 DB41      	IN 41H
+ 9006 2F        	CMA
+ 9007 D340      	OUT 40H
                 
-                
+ 9009 EF        RST 5
                 
                 	END
 0007  A                    0000  B                    0001  C             
 0002  D                    0003  E                    0004  H             
-0005  L                    0006  M                    
+0005  L                    0006  M                    9004  SEN           
 

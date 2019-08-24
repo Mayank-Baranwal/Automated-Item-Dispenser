@@ -1,0 +1,113 @@
+ 0000           cpu "8085.tbl"
+ 0000           hof "int8"
+                
+ 9000           org 9000h 
+                
+ 9000 3E8B      MVI A,8BH
+ 9002 D343      OUT 43H
+                
+ 9004           BEGIN:	
+ 9004 CD4F90    	CALL FINCHECK   ;Check if 2nd dip switch is high, if high then terminate.
+ 9007 DB41      	IN 41H
+ 9009 E604      	ANI 004H   		
+ 900B FE00      	CPI 00H
+ 900D CA1490    	JZ CONT         ;Check if 6th switch is high, if yes increment count else repeat.
+ 9010 C30490    	JMP BEGIN
+ 9013 EF        	RST 5
+                ;In this function we will simply increment the count and between every iteration we will check for 5th and second switch.
+                
+ 9014           CONT:
+ 9014 3E80      	MVI A,80H            
+ 9016 D340      	OUT 40H
+ 9018 CD5990    	CALL DELAY
+ 901B 3E40      	MVI A,40H
+ 901D D340      	OUT 40H
+ 901F CD5990    	CALL DELAY
+ 9022 3E20      	MVI A,20H
+ 9024 D340      	OUT 40H
+ 9026 CD5990    	CALL DELAY
+ 9029 3E10      	MVI A,10H
+ 902B D340      	OUT 40H
+ 902D CD5990    	CALL DELAY
+ 9030 3E08      	MVI A,08H
+ 9032 D340      	OUT 40H
+ 9034 CD5990    	CALL DELAY
+ 9037 3E04      	MVI A,04H
+ 9039 D340      	OUT 40H
+ 903B CD5990    	CALL DELAY
+ 903E 3E02      	MVI A,02H
+ 9040 D340      	OUT 40H
+ 9042 CD5990    	CALL DELAY
+ 9045 3E01      	MVI A,01H
+ 9047 D340      	OUT 40H
+ 9049 CD5990    	CALL DELAY
+ 904C C31490    	JMP CONT
+                
+                ;Checking D2
+ 904F           FINCHECK:
+ 904F DB41      	IN 41H
+ 9051 E640      	ANI 040H
+ 9053 FE00      	CPI 00H
+ 9055 CA7290    	JZ TERMINATE
+ 9058 C9        	RET
+                
+                ;Check d5 and d2, if both low then we will delay and return.
+ 9059           DELAY:
+                
+ 9059 CD7790    CALL PAUSECHECK
+ 905C CD4F90    CALL FINCHECK
+ 905F 210F5D    LXI H, 5D0FH
+ 9062 110400    LXI D, 0004H
+ 9065           LOOP1:
+ 9065           	LOOP2:
+ 9065           		LOOP3:
+ 9065 2D        			DCR L
+ 9066 C26590    			JNZ LOOP3
+ 9069 25        		DCR H
+ 906A C26590    		JNZ LOOP2
+ 906D 1D        	DCR E
+ 906E C26590    	JNZ LOOP1
+ 9071 C9        RET
+                
+                
+ 9072           TERMINATE:
+ 9072 3E00      	MVI A, 00H
+ 9074 D340      	OUT 40H
+ 9076 EF        	RST 5
+                
+                
+ 9077           PAUSECHECK:
+ 9077 CD4F90    	CALL FINCHECK
+ 907A DB41      	IN 41H
+ 907C 57        	MOV D,A
+ 907D E608      	ANI 008H
+ 907F FE00      	CPI 00H
+ 9081 C28790    	JNZ BACK
+ 9084 CD8990    	CALL INF
+                
+ 9087           	BACK:
+ 9087 7A        	MOV A,D
+ 9088 C9        	RET
+                
+ 9089           INF:
+ 9089 CD4F90    	CALL FINCHECK
+ 908C DB41      	IN 41H
+ 908E 57        	MOV D,A
+ 908F E608      	ANI 008H
+ 9091 FE00      	CPI 00H
+ 9093 CA8990    	JZ INF
+                
+ 9096 7A        	MOV A,D
+ 9097 E604      	ANI 004H
+ 9099 FE00      	CPI 00H
+ 909B C28990    	JNZ INF
+ 909E C9        	RET
+ 909F           	END
+0007  A                    0000  B                    9087  BACK          
+9004  BEGIN                0001  C                    9014  CONT          
+0002  D                    9059  DELAY                0003  E             
+904F  FINCHECK             0004  H                    9089  INF           
+0005  L                    9065  LOOP1                9065  LOOP2         
+9065  LOOP3                0006  M                    9077  PAUSECHECK    
+9072  TERMINATE            
+
