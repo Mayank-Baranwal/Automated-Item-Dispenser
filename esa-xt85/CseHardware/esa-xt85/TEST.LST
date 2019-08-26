@@ -3,17 +3,41 @@
                 
  9000           org 9000h 
                 
+ 8FF1 =         CURDT: EQU 8FF1H
+ 044C =         UPDDT: EQU 044cH
+ 8FEF =         CURAD: EQU 8FEFH
+ 0440 =         UPDAD: EQU 0440H
+                
  9000 3E8B      MVI A, 8BH
  9002 D343      OUT 43H
  9004           SEN:
  9004 DB41      	IN 41H
- 9006 2F        	CMA
- 9007 D340      	OUT 40H
+ 9006 32F18F    	STA CURDT
+ 9009 CD4C04    	CALL UPDDT
                 
- 9009 EF        RST 5
+                
+ 900C           	DELAY:
+ 900C 210F5D    	LXI H, 5D0FH
+ 900F 110400    	LXI D, 0004H
+ 9012           	LOOP1:
+ 9012           		LOOP2:
+ 9012           			LOOP3:
+ 9012 2D        				DCR L
+ 9013 C21290    				JNZ LOOP3
+ 9016 25        			DCR H
+ 9017 C21290    			JNZ LOOP2
+ 901A 1D        		DCR E
+ 901B C21290    		JNZ LOOP1
+ 901E C9        	RET
+                
+                
+ 901F EF        RST 5
                 
                 	END
 0007  A                    0000  B                    0001  C             
-0002  D                    0003  E                    0004  H             
-0005  L                    0006  M                    9004  SEN           
+8FEF  CURAD                8FF1  CURDT                0002  D             
+900C  DELAY                0003  E                    0004  H             
+0005  L                    9012  LOOP1                9012  LOOP2         
+9012  LOOP3                0006  M                    9004  SEN           
+0440  UPDAD                044C  UPDDT                
 

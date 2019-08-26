@@ -15,6 +15,9 @@ UPDDT: EQU 044cH
 CURAD: EQU 8FEFH
 UPDAD: EQU 0440H
 
+MVI A,1CH
+STA 8206H
+
 MVI A,8BH
 OUT 43H
 
@@ -32,6 +35,8 @@ STA 8710H
 
 CALL INITIALIZE                      ;initialsing (a*b+s)%m values.
 CALL INITIAL                         ;initialising the random 28 combinations at a certain memo location.
+; JMP LEVEL2_INIT
+
 START:
 	CALL GENERATE_RAN                ;generates a random value IN 4 to 27.
 	LDA 8212H
@@ -46,7 +51,15 @@ START:
 	CALL DELAY
 	LDA CURDT
 	MOV B,A
+	LDA 8351H
+	CPI 01H
+	JNZ lmao
 	IN 41H                          ; takes input from peripheral and comapare it with the value given to peripheral
+	CMA
+	jmp lmao2
+	lmao:
+	IN 41H
+	lmao2:
 	CMP B
 	JNZ NOT_INCREASE                ; if not same, score isn't increased and penalty is increased.
 	LDA 8300H
@@ -66,7 +79,7 @@ START:
 	JNZ START
 	CALL SCORE
 	LDA 8300H					    ;checking eligiblity for next level if score>3
-	CPI 03H
+	CPI 01H
 	JC STOP
 	LDA 8351H                      
 	DCR A
@@ -76,196 +89,87 @@ START:
 	JC STOP
 	CALL INITIALIZE
 	LDA 8351H
-	CPI 01H
-	JZ LEVEL2_INIT               ; Jumping to level1.
+	CPI 02H
+	JNZ lolol
+	; JZ LEVEL2_TEMP               ; Jumping to level1.
 	CALL LEVEL1
+	jmp lol2
+	lolol:
+	CPI 01H
+	JNZ STOP
+	CALL LEVEL2
+	lol2:
 	MVI A,12H
 	STA 8350H
 	JMP START
 
-LEVEL2_INIT:            		;Start of level 2.
-	CALL LEVEL2
-	MVI A,09H
-	STA 8350H
-	START1:
-	CALL GENERATE_RAN          ;Adding the random generator to the address 8212.
-	LDA 8212H
-	CALL ADDRI
-	LHLD 8600H
-	XCHG
-	LDAX D                     ;Traeting the value at the given address field as address for next inst.
-	STA CURDT
-	CALL UPDDT
-	LDA CURDT
-	OUT 40H                    ;Inputting random number to peripheral.
-	LDA CURDT
-	STA 8450H
-	MVI A,00H
-	STA 8470H
-	CALL CALCULATE             ;Calculating the number of LEDs lit.
-	LDA 8470H
-	STA CURDT
-	CALL UPDDT
-	CALL DELAY
-	IN 41H                      ;Acc has the value user input with Dip switches.
 
-; 
-	; MOV F,A
-	MVI C, 01H
-	MVI E, 01H
-	CHECK:
-		CMP C
-		JNZ TEMP
-		LDA 8470H
-		CPI E
-		JNZ N_INC
-		JMP INC
+; LEVEL2_INIT:            		;Start of level 2.
+; 	CALL LEVEL2
+; 	MVI A,09H
+; 	STA 8350H
+; 	START1:
+; 	CALL GENERATE_RAN          ;Adding the random generator to the address 8212.
+; 	LDA 8212H
+; 	CALL ADDRI
+; 	LHLD 8600H
+; 	XCHG
+; 	LDAX D                     ;Traeting the value at the given address field as address for next inst.
+; 	STA CURDT
+; 	CALL UPDDT
+; 	LDA CURDT
+; 	OUT 40H                    ;Inputting random number to peripheral.
+; 	LDA CURDT
+; 	STA 8450H
+; 	MVI A,00H
+; 	STA 8470H
+; 	CALL CALCULATE             ;Calculating the number of LEDs lit.
+; 	LDA 8470H
+; 	STA CURDT
+; 	CALL UPDDT
+; 	CALL DELAY
+; 	IN 41H                      ;Acc has the value user input with Dip switches.
 
-		TEMP:
-		MOV D,A
-		MOV A,C
-		ADD C
-		CPI 60H
-		JZ NOT_INCREASE
-		MOV C,A
-		MOV A,D
-		INR E
-		JMP CHECK
+; 	MVI C, 01H
+; 	MVI E, 01H
+; 	CHECK:
+; 		IN 41H
+; 		CMP C
+; 		JNZ TEMP
+; 		LDA 8470H
+; 		CPI E
+; 		JNZ N_INC
+; 		JMP INC
 
-	; CPI 01H
-	; JNZ TWO			 ;if first LED is selected.
-	; LDA 8470H
-	; CPI 01H
-	; JNZ N_INC
-	; JMP INC
-	; TWO:
-	; CPI 02H
-	; JNZ THREE			 ;if first LED is selected.
-	; LDA 8470H
-	; CPI 02H
-	; JNZ N_INC
-	; JMP INC
-	; THREE:
-	; CPI 04H
-	; JNZ FOUR			 ;if first LED is selected.
-	; LDA 8470H
-	; CPI 03H
-	; JNZ N_INC
-	; JMP INC
-	; FOUR:
-	; CPI 08H
-	; JNZ FIVE			 ;if first LED is selected.
-	; LDA 8470H
-	; CPI 04H
-	; JNZ N_INC
-	; JMP INC
-	; FIVE:
-	; CPI 10H
-	; JNZ SIX			 ;if first LED is selected.
-	; LDA 8470H
-	; CPI 05H
-	; JNZ N_INC
-	; JMP INC
-	; SIX:
-	; CPI 20H
-	; JNZ SEVEN			 ;if first LED is selected.
-	; LDA 8470H
-	; CPI 06H
-	; JNZ N_INC
-	; JMP INC
-	; SEVEN:
-	; CPI 40H
-	; JNZ EIGHT			 ;if first LED is selected.
-	; LDA 8470H
-	; CPI 07H
-	; JNZ N_INC
-	; JMP INC
-	; EIGHT:
-	; CPI 80H
-	; JNZ NOT_INCREASE			 ;if first LED is selected.
-	; LDA 8470H
-	; CPI 01H
-	; JNZ N_INC
-	; JMP INC
+; 		TEMP:
+; 		MOV D,A
+; 		MOV A,C
+; 		ADD C
+; 		CPI 00H
+; 		JZ N_INC
+; 		MOV C,A
+; 		MOV A,D
+; 		INR E
+; 		JMP CHECK
 
-; 
-	; CPI 01H
-	; JZ ONE			 ;if first LED is selected.
-	; CPI 02H
-	; JZ TWO 			;if second LED is selected.
-	; CPI 04H
-	; JZ THREE		;if third LED is selected.
-	; CPI 08H
-	; JZ FOURTH 		;if forth LED is selected.
-	; CPI 10H
-	; JZ FIVE 		;if fifth LED is selected.
-	; CPI 20H
-	; JZ SIX     		;if sixth LED is selected.
-	; CPI 40H
-	; JZ SEVENTH 		;if seventh LED is selected.
-	; CPI 80H
-	; JZ EIGHT 			;if eighth LED is selected.
+; 	INC:
+; 	LDA 8300H
+; 	ADI 01H
+; 	STA 8300H
+; 	JMP L_DEC
 
-	; JMP NOT_INCREASE 			; else if nothing is selected increment penalty.
+; 	N_INC:                   ;Not increasing the score, but increasing the penalty
+; 	LDA 8301H
+; 	ADI 01H
+; 	STA 8301H
 
-; ONE:   							;Checking if one was selected and one is the total number of LEDs lit and updating score accordingly.
-; 	LDA 8470H
-; 	CPI 01H
-; 	JNZ N_INC
-; 	JMP INC
-; TWO: 							;Checking if two was selected and two is the total number of LEDs lit and updating score accordingly.
-; 	LDA 8470H
-; 	CPI 02H
-; 	JNZ N_INC
-; 	JMP INC
-; THREE:							;Checking if three was selected and three is the total number of LEDs lit and updating score 
-; 	LDA 8470H
-; 	CPI 03H
-; 	JNZ N_INC
-; 	JMP INC
-; FOUR: 							;Checking if four was selected and four is the total number of LEDs lit and updating score accordingly.
-; 	LDA 8470H
-; 	CPI 04H
-; 	JNZ N_INC
-; 	JMP INC
-; FIVE:							;Checking if five was selected and five is the total number of LEDs lit and updating score accordingly.
-; 	LDA 8470H
-; 	CPI 05H
-; 	JNZ N_INC
-; 	JMP INC
-; SIX:							;Checking if six was selected and six is the total number of LEDs lit and updating score accordingly.
-; 	LDA 8470H
-; 	CPI 06H
-; 	JNZ N_INC
-; 	JMP INC
-; SEVEN:							;Checking if seven was selected and seven is the total number of LEDs lit and updating score 
-; 	LDA 8470H
-; 	CPI 07H
-; 	JNZ N_INC
-; 	JMP INC
-; EIGHT:							;Checking if eight was selected and eight is the total number of LEDs lit and updating score 
-; 	LDA 8470H
-; 	CPI 08H
-; 	JNZ N_INC
-; 	JMP INC	
-	INC:
-	LDA 8300H
-	ADI 01H
-	STA 8300H
-	JMP L_DEC
-
-	N_INC:                   ;Not increasing the score, but increasing the penalty
-	LDA 8301H
-	ADI 01H
-	STA 8301H
-
-	L_DEC:                   ;Decreasing the number of levels left.
-	LDA 8400H
-	DCR A
-	STA 8400H
-	CPI 00H
-	JNZ START1               
-	CALL SCORE	    
+; 	L_DEC:                   ;Decreasing the number of levels left.
+; 	LDA 8400H
+; 	DCR A
+; 	STA 8400H
+; 	CPI 00H
+; 	JNZ START1               
+; 	CALL SCORE	    
 
 	STOP:                 ;displaying game over- "over"
 	MVI A,00H
@@ -428,76 +332,25 @@ SCORE: 				;displaying score
 	RET	
 
 CALCULATE:                      ; Calculating the total number of LEDs which are litup. Returning the result in 8470H.
-	LDA 8450H  					; if first Led is glowing.
-	ANI 001H
-	CPI 01H
-	JNZ SECOND
-	LDA 8470H
-	INR A
-	STA 8470H
+	MVI C,01H
+	LCALC:
+		LDA 8450H
+		ANA C
+		CMP C
+		JNZ TEMP2
 
-	SECOND:						; if second Led is glowing.
-	LDA 8450H
-	ANI 002H
-	CPI 02H
-	JNZ THIRD
-	LDA 8470H
-	INR A	
-	STA 8470H
+		LDA 8470H
+		INR A
+		STA 8470H
+		
+		TEMP2:
+		MOV A,C
+		ADD C
+		CPI 00H
+		JZ LAST
+		MOV C,A
+		JMP LCALC
 
-	THIRD:				 		; if third Led is glowing.
-	LDA 8450H
-	ANI 004H
-	CPI 04H
-	JNZ FOURTH
-	LDA 8470H
-	INR A
-	STA 8470H
-
-	FOURTH:						; if fourth Led is glowing.
-	LDA 8450H
-	ANI 008H
-	CPI 08H
-	JNZ FIFTH
-	LDA 8470H
-	INR A
-	STA 8470H
-
-	FIFTH:						; if fifth Led is glowing.
-	LDA 8450H
-	ANI 010H
-	CPI 10H
-	JNZ SIXTH
-	LDA 8470H
-	INR A
-	STA 8470H
-
-	SIXTH:						; if sixth Led is glowing.
-	LDA 8450H
-	ANI 020H
-	CPI 20H
-	JNZ SEVENTH
-	LDA 8470H
-	INR A
-	STA 8470H
-
-	SEVENTH:					; if seventh Led is glowing.
-	LDA 8450H
-	ANI 040H
-	CPI 40H
-	JNZ EIGHTH
-	LDA 8470H
-	INR A
-	STA 8470H
-	
-	EIGHTH:						; if eighth Led is glowing.
-	LDA 8450H
-	ANI 080H
-	CPI 80H
-	JNZ LAST
-	LDA 8470H
-	INR A
-	STA 8470H
 	LAST:
 	RET
 

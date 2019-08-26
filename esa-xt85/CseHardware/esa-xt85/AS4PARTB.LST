@@ -15,804 +15,655 @@
  8FEF =         CURAD: EQU 8FEFH
  0440 =         UPDAD: EQU 0440H
                 
- 9000 3E8B      MVI A,8BH
- 9002 D343      OUT 43H
+ 9000 3E1C      MVI A,1CH
+ 9002 320682    STA 8206H
                 
- 9004 3E20      MVI A,20H
- 9006 325083    STA 8350H
+ 9005 3E8B      MVI A,8BH
+ 9007 D343      OUT 43H
                 
- 9009 3E03      MVI A,03H
- 900B 325183    STA 8351H
+ 9009 3E20      MVI A,20H
+ 900B 325083    STA 8350H
                 
- 900E 3E00      MVI A,00H
- 9010 327084    STA 8470H
+ 900E 3E03      MVI A,03H
+ 9010 325183    STA 8351H
                 
  9013 3E00      MVI A,00H
- 9015 321087    STA 8710H
+ 9015 327084    STA 8470H
                 
- 9018 CD5C93    CALL INITIALIZE                      ;initialsing (a*b+s)%m values.
- 901B CD8093    CALL INITIAL                         ;initialising the random 28 combinations at a certain memo location.
- 901E           START:
- 901E CDE792    	CALL GENERATE_RAN                ;generates a random value IN 4 to 27.
- 9021 3A1282    	LDA 8212H
- 9024 CDC192    	CALL ADDR
- 9027 2A0086    	LHLD 8600H
- 902A EB        	XCHG
- 902B 1A        	LDAX D                          ; loads the values as address of the given address location.
- 902C 32F18F    	STA CURDT                       ; value being selected in displayed.
- 902F CD4C04    	CALL UPDDT
- 9032 3AF18F    	LDA CURDT
- 9035 D340      	OUT 40H                         ; sending the value to peripheral
- 9037 CD4A93    	CALL DELAY
- 903A 3AF18F    	LDA CURDT
- 903D 47        	MOV B,A
- 903E DB41      	IN 41H                          ; takes input from peripheral and comapare it with the value given to peripheral
- 9040 B8        	CMP B
- 9041 C24E90    	JNZ NOT_INCREASE                ; if not same, score isn't increased and penalty is increased.
- 9044 3A0083    	LDA 8300H
- 9047 3C        	INR A                           ; otherwise score increased.
- 9048 320083    	STA 8300H
- 904B C35590    	JMP LOOP_DECREASE
+ 9018 3E00      MVI A,00H
+ 901A 321087    STA 8710H
                 
- 904E           	NOT_INCREASE:                   ; incrementing penalty by 1
- 904E 3A0183    	LDA 8301H
- 9051 3C        	INR A
- 9052 320183    	STA 8301H
- 9055           	LOOP_DECREASE:                  ; decreasing the number of loops left.
- 9055 3A0084    	LDA 8400H
- 9058 3D        	DCR A
- 9059 320084    	STA 8400H
- 905C FE00      	CPI 00H                         ; if loop lefts are 0, then showing the score 
- 905E C21E90    	JNZ START
- 9061 CDC191    	CALL SCORE
- 9064 3A0083    	LDA 8300H					    ;checking eligiblity for next level if score>3
- 9067 FE03      	CPI 03H
- 9069 DA1191    	JC STOP
- 906C 3A5183    	LDA 8351H                      
- 906F 3D        	DCR A
- 9070 325183    	STA 8351H                      ; checking the level number and decreasing the count of remaining levels.
- 9073 3A5183    	LDA 8351H
- 9076 FE00      	CPI 00H
- 9078 DA1191    	JC STOP
- 907B CD5C93    	CALL INITIALIZE
- 907E 3A5183    	LDA 8351H
- 9081 FE01      	CPI 01H
- 9083 CA9190    	JZ LEVEL2_INIT               ; Jumping to level1.
- 9086 CD6791    	CALL LEVEL1
- 9089 3E12      	MVI A,12H
- 908B 325083    	STA 8350H
- 908E C31E90    	JMP START
+ 901D CD8E92    CALL INITIALIZE                      ;initialsing (a*b+s)%m values.
+ 9020 CDB292    CALL INITIAL                         ;initialising the random 28 combinations at a certain memo location.
+                ; JMP LEVEL2_INIT
                 
- 9091           LEVEL2_INIT:            		;Start of level 2.
- 9091 CD9491    	CALL LEVEL2
- 9094 3E09      	MVI A,09H
- 9096 325083    	STA 8350H
- 9099           	START1:
- 9099 CDE792    	CALL GENERATE_RAN          ;Adding the random generator to the address 8212.
- 909C 3A1282    	LDA 8212H
- 909F CDD492    	CALL ADDRI
- 90A2 2A0086    	LHLD 8600H
- 90A5 EB        	XCHG
- 90A6 1A        	LDAX D                     ;Traeting the value at the given address field as address for next inst.
- 90A7 32F18F    	STA CURDT
- 90AA CD4C04    	CALL UPDDT
- 90AD 3AF18F    	LDA CURDT
- 90B0 D340      	OUT 40H                    ;Inputting random number to peripheral.
- 90B2 3AF18F    	LDA CURDT
- 90B5 325084    	STA 8450H
- 90B8 3E00      	MVI A,00H
- 90BA 327084    	STA 8470H
- 90BD CD3892    	CALL CALCULATE             ;Calculating the number of LEDs lit.
- 90C0 3A7084    	LDA 8470H
- 90C3 32F18F    	STA CURDT
- 90C6 CD4C04    	CALL UPDDT
- 90C9 CD4A93    	CALL DELAY
- 90CC DB41      	IN 41H                      ;Acc has the value user input with Dip switches.
+ 9023           START:
+ 9023 CD1992    	CALL GENERATE_RAN                ;generates a random value IN 4 to 27.
+ 9026 3A1282    	LDA 8212H
+ 9029 CDF391    	CALL ADDR
+ 902C 2A0086    	LHLD 8600H
+ 902F EB        	XCHG
+ 9030 1A        	LDAX D                          ; loads the values as address of the given address location.
+ 9031 32F18F    	STA CURDT                       ; value being selected in displayed.
+ 9034 CD4C04    	CALL UPDDT
+ 9037 3AF18F    	LDA CURDT
+ 903A D340      	OUT 40H                         ; sending the value to peripheral
+ 903C CD7C92    	CALL DELAY
+ 903F 3AF18F    	LDA CURDT
+ 9042 47        	MOV B,A
+ 9043 3A5183    	LDA 8351H
+ 9046 FE01      	CPI 01H
+ 9048 C25190    	JNZ lmao
+ 904B DB41      	IN 41H                          ; takes input from peripheral and comapare it with the value given to peripheral
+ 904D 2F        	CMA
+ 904E C35390    	jmp lmao2
+ 9051           	lmao:
+ 9051 DB41      	IN 41H
+ 9053           	lmao2:
+ 9053 B8        	CMP B
+ 9054 C26190    	JNZ NOT_INCREASE                ; if not same, score isn't increased and penalty is increased.
+ 9057 3A0083    	LDA 8300H
+ 905A 3C        	INR A                           ; otherwise score increased.
+ 905B 320083    	STA 8300H
+ 905E C36890    	JMP LOOP_DECREASE
                 
-                ; 
-                	; MOV F,A
- 90CE 0E01      	MVI C, 01H
- 90D0 1E01      	MVI E, 01H
- 90D2           	CHECK:
- 90D2 B9        		CMP C
- 90D3 C2E190    		JNZ TEMP
- 90D6 3A7084    		LDA 8470H
- 90D9 FE03      		CPI E
- 90DB C2FA90    		JNZ N_INC
- 90DE C3EF90    		JMP INC
+ 9061           	NOT_INCREASE:                   ; incrementing penalty by 1
+ 9061 3A0183    	LDA 8301H
+ 9064 3C        	INR A
+ 9065 320183    	STA 8301H
+ 9068           	LOOP_DECREASE:                  ; decreasing the number of loops left.
+ 9068 3A0084    	LDA 8400H
+ 906B 3D        	DCR A
+ 906C 320084    	STA 8400H
+ 906F FE00      	CPI 00H                         ; if loop lefts are 0, then showing the score 
+ 9071 C22390    	JNZ START
+ 9074 CD5F91    	CALL SCORE
+ 9077 3A0083    	LDA 8300H					    ;checking eligiblity for next level if score>3
+ 907A FE01      	CPI 01H
+ 907C DAAF90    	JC STOP
+ 907F 3A5183    	LDA 8351H                      
+ 9082 3D        	DCR A
+ 9083 325183    	STA 8351H                      ; checking the level number and decreasing the count of remaining levels.
+ 9086 3A5183    	LDA 8351H
+ 9089 FE00      	CPI 00H
+ 908B DAAF90    	JC STOP
+ 908E CD8E92    	CALL INITIALIZE
+ 9091 3A5183    	LDA 8351H
+ 9094 FE02      	CPI 02H
+ 9096 C29F90    	JNZ lolol
+                	; JZ LEVEL2_TEMP               ; Jumping to level1.
+ 9099 CD0591    	CALL LEVEL1
+ 909C C3A790    	jmp lol2
+ 909F           	lolol:
+ 909F FE01      	CPI 01H
+ 90A1 C2AF90    	JNZ STOP
+ 90A4 CD3291    	CALL LEVEL2
+ 90A7           	lol2:
+ 90A7 3E12      	MVI A,12H
+ 90A9 325083    	STA 8350H
+ 90AC C32390    	JMP START
                 
- 90E1           		TEMP:
- 90E1 57        		MOV D,A
- 90E2 79        		MOV A,C
- 90E3 81        		ADD C
- 90E4 FE60      		CPI 60H
- 90E6 CA4E90    		JZ NOT_INCREASE
- 90E9 4F        		MOV C,A
- 90EA 7A        		MOV A,D
- 90EB 1C        		INR E
- 90EC C3D290    		JMP CHECK
                 
-                	; CPI 01H
-                	; JNZ TWO			 ;if first LED is selected.
-                	; LDA 8470H
-                	; CPI 01H
-                	; JNZ N_INC
-                	; JMP INC
-                	; TWO:
-                	; CPI 02H
-                	; JNZ THREE			 ;if first LED is selected.
-                	; LDA 8470H
-                	; CPI 02H
-                	; JNZ N_INC
-                	; JMP INC
-                	; THREE:
-                	; CPI 04H
-                	; JNZ FOUR			 ;if first LED is selected.
-                	; LDA 8470H
-                	; CPI 03H
-                	; JNZ N_INC
-                	; JMP INC
-                	; FOUR:
-                	; CPI 08H
-                	; JNZ FIVE			 ;if first LED is selected.
-                	; LDA 8470H
-                	; CPI 04H
-                	; JNZ N_INC
-                	; JMP INC
-                	; FIVE:
-                	; CPI 10H
-                	; JNZ SIX			 ;if first LED is selected.
-                	; LDA 8470H
-                	; CPI 05H
-                	; JNZ N_INC
-                	; JMP INC
-                	; SIX:
-                	; CPI 20H
-                	; JNZ SEVEN			 ;if first LED is selected.
-                	; LDA 8470H
-                	; CPI 06H
-                	; JNZ N_INC
-                	; JMP INC
-                	; SEVEN:
-                	; CPI 40H
-                	; JNZ EIGHT			 ;if first LED is selected.
-                	; LDA 8470H
-                	; CPI 07H
-                	; JNZ N_INC
-                	; JMP INC
-                	; EIGHT:
-                	; CPI 80H
-                	; JNZ NOT_INCREASE			 ;if first LED is selected.
-                	; LDA 8470H
-                	; CPI 01H
-                	; JNZ N_INC
-                	; JMP INC
-                
-                ; 
-                	; CPI 01H
-                	; JZ ONE			 ;if first LED is selected.
-                	; CPI 02H
-                	; JZ TWO 			;if second LED is selected.
-                	; CPI 04H
-                	; JZ THREE		;if third LED is selected.
-                	; CPI 08H
-                	; JZ FOURTH 		;if forth LED is selected.
-                	; CPI 10H
-                	; JZ FIVE 		;if fifth LED is selected.
-                	; CPI 20H
-                	; JZ SIX     		;if sixth LED is selected.
-                	; CPI 40H
-                	; JZ SEVENTH 		;if seventh LED is selected.
-                	; CPI 80H
-                	; JZ EIGHT 			;if eighth LED is selected.
-                
-                	; JMP NOT_INCREASE 			; else if nothing is selected increment penalty.
-                
-                ; ONE:   							;Checking if one was selected and one is the total number of LEDs lit and updating score accordingly.
+                ; LEVEL2_INIT:            		;Start of level 2.
+                ; 	CALL LEVEL2
+                ; 	MVI A,09H
+                ; 	STA 8350H
+                ; 	START1:
+                ; 	CALL GENERATE_RAN          ;Adding the random generator to the address 8212.
+                ; 	LDA 8212H
+                ; 	CALL ADDRI
+                ; 	LHLD 8600H
+                ; 	XCHG
+                ; 	LDAX D                     ;Traeting the value at the given address field as address for next inst.
+                ; 	STA CURDT
+                ; 	CALL UPDDT
+                ; 	LDA CURDT
+                ; 	OUT 40H                    ;Inputting random number to peripheral.
+                ; 	LDA CURDT
+                ; 	STA 8450H
+                ; 	MVI A,00H
+                ; 	STA 8470H
+                ; 	CALL CALCULATE             ;Calculating the number of LEDs lit.
                 ; 	LDA 8470H
-                ; 	CPI 01H
-                ; 	JNZ N_INC
-                ; 	JMP INC
-                ; TWO: 							;Checking if two was selected and two is the total number of LEDs lit and updating score accordingly.
-                ; 	LDA 8470H
-                ; 	CPI 02H
-                ; 	JNZ N_INC
-                ; 	JMP INC
-                ; THREE:							;Checking if three was selected and three is the total number of LEDs lit and updating score 
-                ; 	LDA 8470H
-                ; 	CPI 03H
-                ; 	JNZ N_INC
-                ; 	JMP INC
-                ; FOUR: 							;Checking if four was selected and four is the total number of LEDs lit and updating score accordingly.
-                ; 	LDA 8470H
-                ; 	CPI 04H
-                ; 	JNZ N_INC
-                ; 	JMP INC
-                ; FIVE:							;Checking if five was selected and five is the total number of LEDs lit and updating score accordingly.
-                ; 	LDA 8470H
-                ; 	CPI 05H
-                ; 	JNZ N_INC
-                ; 	JMP INC
-                ; SIX:							;Checking if six was selected and six is the total number of LEDs lit and updating score accordingly.
-                ; 	LDA 8470H
-                ; 	CPI 06H
-                ; 	JNZ N_INC
-                ; 	JMP INC
-                ; SEVEN:							;Checking if seven was selected and seven is the total number of LEDs lit and updating score 
-                ; 	LDA 8470H
-                ; 	CPI 07H
-                ; 	JNZ N_INC
-                ; 	JMP INC
-                ; EIGHT:							;Checking if eight was selected and eight is the total number of LEDs lit and updating score 
-                ; 	LDA 8470H
-                ; 	CPI 08H
-                ; 	JNZ N_INC
-                ; 	JMP INC	
- 90EF           	INC:
- 90EF 3A0083    	LDA 8300H
- 90F2 C601      	ADI 01H
- 90F4 320083    	STA 8300H
- 90F7 C30291    	JMP L_DEC
+                ; 	STA CURDT
+                ; 	CALL UPDDT
+                ; 	CALL DELAY
+                ; 	IN 41H                      ;Acc has the value user input with Dip switches.
                 
- 90FA           	N_INC:                   ;Not increasing the score, but increasing the penalty
- 90FA 3A0183    	LDA 8301H
- 90FD C601      	ADI 01H
- 90FF 320183    	STA 8301H
+                ; 	MVI C, 01H
+                ; 	MVI E, 01H
+                ; 	CHECK:
+                ; 		IN 41H
+                ; 		CMP C
+                ; 		JNZ TEMP
+                ; 		LDA 8470H
+                ; 		CPI E
+                ; 		JNZ N_INC
+                ; 		JMP INC
                 
- 9102           	L_DEC:                   ;Decreasing the number of levels left.
- 9102 3A0084    	LDA 8400H
- 9105 3D        	DCR A
- 9106 320084    	STA 8400H
- 9109 FE00      	CPI 00H
- 910B C29990    	JNZ START1               
- 910E CDC191    	CALL SCORE	    
+                ; 		TEMP:
+                ; 		MOV D,A
+                ; 		MOV A,C
+                ; 		ADD C
+                ; 		CPI 00H
+                ; 		JZ N_INC
+                ; 		MOV C,A
+                ; 		MOV A,D
+                ; 		INR E
+                ; 		JMP CHECK
                 
- 9111           	STOP:                 ;displaying game over- "over"
- 9111 3E00      	MVI A,00H
- 9113 0600      	MVI B,00H
+                ; 	INC:
+                ; 	LDA 8300H
+                ; 	ADI 01H
+                ; 	STA 8300H
+                ; 	JMP L_DEC
+                
+                ; 	N_INC:                   ;Not increasing the score, but increasing the penalty
+                ; 	LDA 8301H
+                ; 	ADI 01H
+                ; 	STA 8301H
+                
+                ; 	L_DEC:                   ;Decreasing the number of levels left.
+                ; 	LDA 8400H
+                ; 	DCR A
+                ; 	STA 8400H
+                ; 	CPI 00H
+                ; 	JNZ START1               
+                ; 	CALL SCORE	    
+                
+ 90AF           	STOP:                 ;displaying game over- "over"
+ 90AF 3E00      	MVI A,00H
+ 90B1 0600      	MVI B,00H
                 	
- 9115 214088    	LXI H,8840H
- 9118 3610      	MVI M,10H
+ 90B3 214088    	LXI H,8840H
+ 90B6 3610      	MVI M,10H
                 
- 911A 214188    	LXI H,8841H
- 911D 3613      	MVI M,13H
+ 90B8 214188    	LXI H,8841H
+ 90BB 3613      	MVI M,13H
                 
- 911F 214288    	LXI H,8842H
- 9122 3610      	MVI M,10H
+ 90BD 214288    	LXI H,8842H
+ 90C0 3610      	MVI M,10H
                 
- 9124 214388    	LXI H,8843H
- 9127 3616      	MVI M,16H
+ 90C2 214388    	LXI H,8843H
+ 90C5 3616      	MVI M,16H
                 
- 9129 214088    	LXI H,8840H          ; displaying game over using CURDT on data bits of board.
- 912C CD8903    	CALL OUTPUT
- 912F 3A0087    	LDA 8700H
- 9132 32F18F    	STA CURDT
- 9135 CD4C04    	CALL UPDDT
- 9138 CDBA03    	CALL RDKBD
- 913B CDBE02    	CALL CLEAR
+ 90C7 214088    	LXI H,8840H          ; displaying game over using CURDT on data bits of board.
+ 90CA CD8903    	CALL OUTPUT
+ 90CD 3A0087    	LDA 8700H
+ 90D0 32F18F    	STA CURDT
+ 90D3 CD4C04    	CALL UPDDT
+ 90D6 CDBA03    	CALL RDKBD
+ 90D9 CDBE02    	CALL CLEAR
                 
- 913E 3E00      	MVI A,00H        
- 9140 0600      	MVI B,00H
- 9142 214088    	LXI H,8840H
- 9145 3600      	MVI M,00H
+ 90DC 3E00      	MVI A,00H        
+ 90DE 0600      	MVI B,00H
+ 90E0 214088    	LXI H,8840H
+ 90E3 3600      	MVI M,00H
                 
- 9147 214188    	LXI H,8841H
- 914A 3615      	MVI M,15H
+ 90E5 214188    	LXI H,8841H
+ 90E8 3615      	MVI M,15H
                 
- 914C 214288    	LXI H,8842H
- 914F 360E      	MVI M,0EH
+ 90EA 214288    	LXI H,8842H
+ 90ED 360E      	MVI M,0EH
                 
- 9151 214388    	LXI H,8843H
- 9154 3614      	MVI M,14H
+ 90EF 214388    	LXI H,8843H
+ 90F2 3614      	MVI M,14H
                 
- 9156 214088    	LXI H,8840H        ;displaying score on data bits of board.
- 9159 CD8903    	CALL OUTPUT
- 915C CDBA03    	CALL RDKBD
- 915F CDBE02    	CALL CLEAR
- 9162 3E00      	MVI A,00H
- 9164 D340      	OUT 40H
- 9166 EF        	RST 5
+ 90F4 214088    	LXI H,8840H        ;displaying score on data bits of board.
+ 90F7 CD8903    	CALL OUTPUT
+ 90FA CDBA03    	CALL RDKBD
+ 90FD CDBE02    	CALL CLEAR
+ 9100 3E00      	MVI A,00H
+ 9102 D340      	OUT 40H
+ 9104 EF        	RST 5
                 
- 9167           LEVEL1:
- 9167 3E00      	MVI A,00H           ;marking the start of level 1 by displaying lev 1.
- 9169 0600      	MVI B,00H
+ 9105           LEVEL1:
+ 9105 3E00      	MVI A,00H           ;marking the start of level 1 by displaying lev 1.
+ 9107 0600      	MVI B,00H
                 
- 916B 214088    	LXI H,8840H
- 916E 3611      	MVI M,11H
+ 9109 214088    	LXI H,8840H
+ 910C 3611      	MVI M,11H
                 
- 9170 214188    	LXI H,8841H
- 9173 360E      	MVI M,0EH
+ 910E 214188    	LXI H,8841H
+ 9111 360E      	MVI M,0EH
                 
- 9175 214288    	LXI H,8842H
- 9178 3615      	MVI M,15H
+ 9113 214288    	LXI H,8842H
+ 9116 3615      	MVI M,15H
                 
- 917A 214388    	LXI H,8843H
- 917D 3611      	MVI M,11H
+ 9118 214388    	LXI H,8843H
+ 911B 3611      	MVI M,11H
                 
- 917F 214088    	LXI H,8840H
- 9182 CD8903    	CALL OUTPUT
- 9185 3E01      	MVI A,01H
- 9187 32F18F    	STA CURDT
- 918A CD4C04    	CALL UPDDT
- 918D CDBA03    	CALL RDKBD
- 9190 CDBE02    	CALL CLEAR
- 9193 C9        	RET
+ 911D 214088    	LXI H,8840H
+ 9120 CD8903    	CALL OUTPUT
+ 9123 3E01      	MVI A,01H
+ 9125 32F18F    	STA CURDT
+ 9128 CD4C04    	CALL UPDDT
+ 912B CDBA03    	CALL RDKBD
+ 912E CDBE02    	CALL CLEAR
+ 9131 C9        	RET
                 
- 9194           LEVEL2:			;marking the start of level 2 by displaying lev 2
- 9194 3E00      	MVI A,00H
- 9196 0600      	MVI B,00H
+ 9132           LEVEL2:			;marking the start of level 2 by displaying lev 2
+ 9132 3E00      	MVI A,00H
+ 9134 0600      	MVI B,00H
                 
- 9198 214088    	LXI H,8840H
- 919B 3611      	MVI M,11H
+ 9136 214088    	LXI H,8840H
+ 9139 3611      	MVI M,11H
                 
- 919D 214188    	LXI H,8841H
- 91A0 360E      	MVI M,0EH
+ 913B 214188    	LXI H,8841H
+ 913E 360E      	MVI M,0EH
                 
- 91A2 214288    	LXI H,8842H
- 91A5 3615      	MVI M,15H
+ 9140 214288    	LXI H,8842H
+ 9143 3615      	MVI M,15H
                 
- 91A7 214388    	LXI H,8843H
- 91AA 3611      	MVI M,11H
+ 9145 214388    	LXI H,8843H
+ 9148 3611      	MVI M,11H
                 
- 91AC 214088    	LXI H,8840H
- 91AF CD8903    	CALL OUTPUT
- 91B2 3E02      	MVI A,02H
- 91B4 32F18F    	STA CURDT
- 91B7 CD4C04    	CALL UPDDT
- 91BA CDBA03    	CALL RDKBD
- 91BD CDBE02    	CALL CLEAR
- 91C0 C9        	RET
+ 914A 214088    	LXI H,8840H
+ 914D CD8903    	CALL OUTPUT
+ 9150 3E02      	MVI A,02H
+ 9152 32F18F    	STA CURDT
+ 9155 CD4C04    	CALL UPDDT
+ 9158 CDBA03    	CALL RDKBD
+ 915B CDBE02    	CALL CLEAR
+ 915E C9        	RET
                 
- 91C1           SCORE: 				;displaying score
- 91C1 3E00      	MVI A,00H
- 91C3 0600      	MVI B,00H
+ 915F           SCORE: 				;displaying score
+ 915F 3E00      	MVI A,00H
+ 9161 0600      	MVI B,00H
                 
- 91C5 214088    	LXI H,8840H
- 91C8 3605      	MVI M,05H
+ 9163 214088    	LXI H,8840H
+ 9166 3605      	MVI M,05H
                 
- 91CA 214188    	LXI H,8841H
- 91CD 360C      	MVI M,0CH
+ 9168 214188    	LXI H,8841H
+ 916B 360C      	MVI M,0CH
                 
- 91CF 214288    	LXI H,8842H
- 91D2 3600      	MVI M,00H
+ 916D 214288    	LXI H,8842H
+ 9170 3600      	MVI M,00H
                 
- 91D4 214388    	LXI H,8843H
- 91D7 3614      	MVI M,14H
+ 9172 214388    	LXI H,8843H
+ 9175 3614      	MVI M,14H
                 
- 91D9 214088    	LXI H,8840H
- 91DC CD8903    	CALL OUTPUT
+ 9177 214088    	LXI H,8840H
+ 917A CD8903    	CALL OUTPUT
                 
- 91DF 3A0083    	LDA 8300H		;displaying score using data bits of board.
- 91E2 32F18F    	STA CURDT
- 91E5 3A0083    	LDA 8300H
- 91E8 47        	MOV B,A
- 91E9 3A1087    	LDA 8710H
- 91EC 80        	ADD B
- 91ED 321087    	STA 8710H
- 91F0 3A0087    	LDA 8700H
- 91F3 47        	MOV B,A
- 91F4 3A1087    	LDA 8710H
- 91F7 B8        	CMP B
- 91F8 DA0192    	JC DISPLAY
- 91FB 3A1087    	LDA 8710H
- 91FE 320087    	STA 8700H
+ 917D 3A0083    	LDA 8300H		;displaying score using data bits of board.
+ 9180 32F18F    	STA CURDT
+ 9183 3A0083    	LDA 8300H
+ 9186 47        	MOV B,A
+ 9187 3A1087    	LDA 8710H
+ 918A 80        	ADD B
+ 918B 321087    	STA 8710H
+ 918E 3A0087    	LDA 8700H
+ 9191 47        	MOV B,A
+ 9192 3A1087    	LDA 8710H
+ 9195 B8        	CMP B
+ 9196 DA9F91    	JC DISPLAY
+ 9199 3A1087    	LDA 8710H
+ 919C 320087    	STA 8700H
                 	
- 9201           	DISPLAY:		;dispalying penalty
- 9201 CD4C04    	CALL UPDDT
- 9204 CDBA03    	CALL RDKBD
- 9207 CDBE02    	CALL CLEAR
+ 919F           	DISPLAY:		;dispalying penalty
+ 919F CD4C04    	CALL UPDDT
+ 91A2 CDBA03    	CALL RDKBD
+ 91A5 CDBE02    	CALL CLEAR
                 
- 920A 3E00      	MVI A,00H
- 920C 0600      	MVI B,00H
+ 91A8 3E00      	MVI A,00H
+ 91AA 0600      	MVI B,00H
                 
- 920E 214488    	LXI H,8844H
- 9211 3611      	MVI M,11H
+ 91AC 214488    	LXI H,8844H
+ 91AF 3611      	MVI M,11H
                 
- 9213 214588    	LXI H,8845H
- 9216 360E      	MVI M,0EH
+ 91B1 214588    	LXI H,8845H
+ 91B4 360E      	MVI M,0EH
                 
- 9218 214688    	LXI H,8846H
- 921B 360F      	MVI M,0FH
+ 91B6 214688    	LXI H,8846H
+ 91B9 360F      	MVI M,0FH
                 
- 921D 214788    	LXI H,8847H
- 9220 3613      	MVI M,13H
+ 91BB 214788    	LXI H,8847H
+ 91BE 3613      	MVI M,13H
                 
- 9222 214488    	LXI H,8844H
- 9225 CD8903    	CALL OUTPUT
+ 91C0 214488    	LXI H,8844H
+ 91C3 CD8903    	CALL OUTPUT
                 
- 9228 3A0183    	LDA 8301H		;displaying penalty using data bits of board
- 922B 32F18F    	STA CURDT
- 922E CD4C04    	CALL UPDDT
- 9231 CDBA03    	CALL RDKBD
- 9234 CDBE02    	CALL CLEAR
- 9237 C9        	RET	
+ 91C6 3A0183    	LDA 8301H		;displaying penalty using data bits of board
+ 91C9 32F18F    	STA CURDT
+ 91CC CD4C04    	CALL UPDDT
+ 91CF CDBA03    	CALL RDKBD
+ 91D2 CDBE02    	CALL CLEAR
+ 91D5 C9        	RET	
                 
- 9238           CALCULATE:                      ; Calculating the total number of LEDs which are litup. Returning the result in 8470H.
- 9238 3A5084    	LDA 8450H  					; if first Led is glowing.
- 923B E601      	ANI 001H
- 923D FE01      	CPI 01H
- 923F C24992    	JNZ SECOND
- 9242 3A7084    	LDA 8470H
- 9245 3C        	INR A
- 9246 327084    	STA 8470H
+ 91D6           CALCULATE:                      ; Calculating the total number of LEDs which are litup. Returning the result in 8470H.
+ 91D6 0E01      	MVI C,01H
+ 91D8           	LCALC:
+ 91D8 3A5084    		LDA 8450H
+ 91DB A1        		ANA C
+ 91DC B9        		CMP C
+ 91DD C2E791    		JNZ TEMP2
                 
- 9249           	SECOND:						; if second Led is glowing.
- 9249 3A5084    	LDA 8450H
- 924C E602      	ANI 002H
- 924E FE02      	CPI 02H
- 9250 C25A92    	JNZ THIRD
- 9253 3A7084    	LDA 8470H
- 9256 3C        	INR A	
- 9257 327084    	STA 8470H
+ 91E0 3A7084    		LDA 8470H
+ 91E3 3C        		INR A
+ 91E4 327084    		STA 8470H
+                		
+ 91E7           		TEMP2:
+ 91E7 79        		MOV A,C
+ 91E8 81        		ADD C
+ 91E9 FE00      		CPI 00H
+ 91EB CAF291    		JZ LAST
+ 91EE 4F        		MOV C,A
+ 91EF C3D891    		JMP LCALC
                 
- 925A           	THIRD:				 		; if third Led is glowing.
- 925A 3A5084    	LDA 8450H
- 925D E604      	ANI 004H
- 925F FE04      	CPI 04H
- 9261 C26B92    	JNZ FOURTH
- 9264 3A7084    	LDA 8470H
- 9267 3C        	INR A
- 9268 327084    	STA 8470H
-                
- 926B           	FOURTH:						; if fourth Led is glowing.
- 926B 3A5084    	LDA 8450H
- 926E E608      	ANI 008H
- 9270 FE08      	CPI 08H
- 9272 C27C92    	JNZ FIFTH
- 9275 3A7084    	LDA 8470H
- 9278 3C        	INR A
- 9279 327084    	STA 8470H
-                
- 927C           	FIFTH:						; if fifth Led is glowing.
- 927C 3A5084    	LDA 8450H
- 927F E610      	ANI 010H
- 9281 FE10      	CPI 10H
- 9283 C28D92    	JNZ SIXTH
- 9286 3A7084    	LDA 8470H
- 9289 3C        	INR A
- 928A 327084    	STA 8470H
-                
- 928D           	SIXTH:						; if sixth Led is glowing.
- 928D 3A5084    	LDA 8450H
- 9290 E620      	ANI 020H
- 9292 FE20      	CPI 20H
- 9294 C29E92    	JNZ SEVENTH
- 9297 3A7084    	LDA 8470H
- 929A 3C        	INR A
- 929B 327084    	STA 8470H
-                
- 929E           	SEVENTH:					; if seventh Led is glowing.
- 929E 3A5084    	LDA 8450H
- 92A1 E640      	ANI 040H
- 92A3 FE40      	CPI 40H
- 92A5 C2AF92    	JNZ EIGHTH
- 92A8 3A7084    	LDA 8470H
- 92AB 3C        	INR A
- 92AC 327084    	STA 8470H
-                	
- 92AF           	EIGHTH:						; if eighth Led is glowing.
- 92AF 3A5084    	LDA 8450H
- 92B2 E680      	ANI 080H
- 92B4 FE80      	CPI 80H
- 92B6 C2C092    	JNZ LAST
- 92B9 3A7084    	LDA 8470H
- 92BC 3C        	INR A
- 92BD 327084    	STA 8470H
- 92C0           	LAST:
- 92C0 C9        	RET
+ 91F2           	LAST:
+ 91F2 C9        	RET
                 
                 
- 92C1           ADDR:                         ; Adder function
- 92C1 1E00      	MVI E,00h
- 92C3 210185    	LXI H,8501H
- 92C6 4D        	MOV C,L
- 92C7 44        	MOV B,H
- 92C8 2A1282    	LHLD 8212H
- 92CB 09        	DAD B
- 92CC D2D092    	JNC LABEL1
- 92CF 1C        	INR E
- 92D0 220086    	LABEL1:SHLD 8600H
- 92D3 C9        	RET
+ 91F3           ADDR:                         ; Adder function
+ 91F3 1E00      	MVI E,00h
+ 91F5 210185    	LXI H,8501H
+ 91F8 4D        	MOV C,L
+ 91F9 44        	MOV B,H
+ 91FA 2A1282    	LHLD 8212H
+ 91FD 09        	DAD B
+ 91FE D20292    	JNC LABEL1
+ 9201 1C        	INR E
+ 9202 220086    	LABEL1:SHLD 8600H
+ 9205 C9        	RET
                 
- 92D4           ADDRI:
- 92D4 1E00      	MVI E,00h
- 92D6 211D85    	LXI H,851DH
- 92D9 4D        	MOV C,L
- 92DA 44        	MOV B,H
- 92DB 2A1282    	LHLD 8212H
- 92DE 09        	DAD B
- 92DF D2E392    	JNC LABEL13
- 92E2 1C        	INR E
- 92E3 220086    	LABEL13:SHLD 8600H
- 92E6 C9        	RET	
+ 9206           ADDRI:
+ 9206 1E00      	MVI E,00h
+ 9208 211D85    	LXI H,851DH
+ 920B 4D        	MOV C,L
+ 920C 44        	MOV B,H
+ 920D 2A1282    	LHLD 8212H
+ 9210 09        	DAD B
+ 9211 D21592    	JNC LABEL13
+ 9214 1C        	INR E
+ 9215 220086    	LABEL13:SHLD 8600H
+ 9218 C9        	RET	
                 
                 
- 92E7           GENERATE_RAN:                 		;Genrates Random Variable (a*b+s)%m
- 92E7 CDFF92    	CALL MULTIPLY
- 92EA 3A0282    	LDA 8202H			;8202 has a*b ans s=01D, adding both of them.
- 92ED C61D      	ADI 01DH
- 92EF 320282    	STA 8202H                 
- 92F2 CD1293    	CALL MOD1   			  ;taking mod with a large number
- 92F5 CD2E93    	CALL MOD2     			  ; taking mod with 28 so that it fits IN 4 to 27.
- 92F8 3A0682    	LDA 8206H
- 92FB 320082    	STA 8200H
- 92FE C9        	RET
+ 9219           GENERATE_RAN:                 		;Genrates Random Variable (a*b+s)%m
+ 9219 CD3192    	CALL MULTIPLY
+ 921C 3A0282    	LDA 8202H			;8202 has a*b ans s=01D, adding both of them.
+ 921F C61D      	ADI 01DH
+ 9221 320282    	STA 8202H                 
+ 9224 CD4492    	CALL MOD1   			  ;taking mod with a large number
+ 9227 CD6092    	CALL MOD2     			  ; taking mod with 28 so that it fits IN 4 to 27.
+ 922A 3A0682    	LDA 8206H
+ 922D 320082    	STA 8200H
+ 9230 C9        	RET
                 
- 92FF           MULTIPLY:                    		 ;Multiplies value stored at 8200 and 8201 and stores it in 8202.
- 92FF 2A0082    	LHLD 8200H
- 9302 EB        	XCHG
- 9303 4A        	MOV C,D
- 9304 1600      	MVI D,00H
- 9306 210000    	LXI H,0000H
- 9309 19        	LABEL3: DAD D
- 930A 0D        	DCR C
- 930B C20993    	JNZ LABEL3
- 930E 220282    	SHLD 8202H
- 9311 C9        	RET
+ 9231           MULTIPLY:                    		 ;Multiplies value stored at 8200 and 8201 and stores it in 8202.
+ 9231 2A0082    	LHLD 8200H
+ 9234 EB        	XCHG
+ 9235 4A        	MOV C,D
+ 9236 1600      	MVI D,00H
+ 9238 210000    	LXI H,0000H
+ 923B 19        	LABEL3: DAD D
+ 923C 0D        	DCR C
+ 923D C23B92    	JNZ LABEL3
+ 9240 220282    	SHLD 8202H
+ 9243 C9        	RET
                 
- 9312           MOD1:					; Right now 8202 contains value of (a*b+s) and 8204 pair value of m.
- 9312 010000    	LXI B,0000H
- 9315 2A0482    	LHLD 8204H               	; Mod of value stored at 8202 with value stored at 8204 and return result in 8206.
- 9318 EB        	XCHG
- 9319 2A0282    	LHLD 8202H
- 931C 7D        	LOOP2: MOV A,L
- 931D 93        	SUB E
- 931E 6F        	MOV L,A
- 931F 7C        	MOV A,H
- 9320 9A        	SBB D
- 9321 67        	MOV H,A
- 9322 DA2993    	JC LOOP1
- 9325 03        	INX B
- 9326 C31C93    	JMP LOOP2
- 9329 19        	LOOP1: DAD D
- 932A 220682    	SHLD 8206H
- 932D C9        	RET
+ 9244           MOD1:					; Right now 8202 contains value of (a*b+s) and 8204 pair value of m.
+ 9244 010000    	LXI B,0000H
+ 9247 2A0482    	LHLD 8204H               	; Mod of value stored at 8202 with value stored at 8204 and return result in 8206.
+ 924A EB        	XCHG
+ 924B 2A0282    	LHLD 8202H
+ 924E 7D        	LOOP2: MOV A,L
+ 924F 93        	SUB E
+ 9250 6F        	MOV L,A
+ 9251 7C        	MOV A,H
+ 9252 9A        	SBB D
+ 9253 67        	MOV H,A
+ 9254 DA5B92    	JC LOOP1
+ 9257 03        	INX B
+ 9258 C34E92    	JMP LOOP2
+ 925B 19        	LOOP1: DAD D
+ 925C 220682    	SHLD 8206H
+ 925F C9        	RET
                 
- 932E           MOD2:                        ; Mod of new a(stored at 8206) with 28
- 932E 010000    	LXI B,0000H
- 9331 2A1082    	LHLD 8210H
- 9334 EB        	XCHG
- 9335 2A0682    	LHLD 8206H
- 9338 7D        	LOOP21: MOV A,L
- 9339 93        	SUB E
- 933A 6F        	MOV L,A
- 933B 7C        	MOV A,H
- 933C 9A        	SBB D
- 933D 67        	MOV H,A
- 933E DA4593    	JC LOOP11
- 9341 03        	INX B
- 9342 C33893    	JMP LOOP21
- 9345 19        	LOOP11: DAD D
- 9346 221282    	SHLD 8212H
- 9349 C9        	RET
+ 9260           MOD2:                        ; Mod of new a(stored at 8206) with 28
+ 9260 010000    	LXI B,0000H
+ 9263 2A1082    	LHLD 8210H
+ 9266 EB        	XCHG
+ 9267 2A0682    	LHLD 8206H
+ 926A 7D        	LOOP21: MOV A,L
+ 926B 93        	SUB E
+ 926C 6F        	MOV L,A
+ 926D 7C        	MOV A,H
+ 926E 9A        	SBB D
+ 926F 67        	MOV H,A
+ 9270 DA7792    	JC LOOP11
+ 9273 03        	INX B
+ 9274 C36A92    	JMP LOOP21
+ 9277 19        	LOOP11: DAD D
+ 9278 221282    	SHLD 8212H
+ 927B C9        	RET
                 
- 934A           DELAY:                         ; Creating a time delay by calling inloop 0A604times and that is again called 20 or 12 or 9
+ 927C           DELAY:                         ; Creating a time delay by calling inloop 0A604times and that is again called 20 or 12 or 9
                 								; times depending on the number of level.
- 934A 3A5083    	LDA 8350H
- 934D 4F        	MOV C,A
- 934E           OUTLOOP:
- 934E 1104A6    	LXI D,0A604H
- 9351           INLOOP:
- 9351 1B        	DCX D
- 9352 7A        	MOV A,D
- 9353 B3        	ORA E
- 9354 C25193    	JNZ INLOOP
- 9357 0D        	DCR C
- 9358 C24E93    	JNZ OUTLOOP
- 935B C9        	RET
+ 927C 3A5083    	LDA 8350H
+ 927F 4F        	MOV C,A
+ 9280           OUTLOOP:
+ 9280 1104A6    	LXI D,0A604H
+ 9283           INLOOP:
+ 9283 1B        	DCX D
+ 9284 7A        	MOV A,D
+ 9285 B3        	ORA E
+ 9286 C28392    	JNZ INLOOP
+ 9289 0D        	DCR C
+ 928A C28092    	JNZ OUTLOOP
+ 928D C9        	RET
                 
- 935C           INITIALIZE:                      ;Initialsing all the param for calculation of random number.
- 935C 3E00      	MVI A,00H                    ;Initialising level with 0
- 935E 320083    	STA 8300H
+ 928E           INITIALIZE:                      ;Initialsing all the param for calculation of random number.
+ 928E 3E00      	MVI A,00H                    ;Initialising level with 0
+ 9290 320083    	STA 8300H
                 
- 9361 3E00      	MVI A,00H   				 ;Initialising score with 0 
- 9363 320183    	STA 8301H
+ 9293 3E00      	MVI A,00H   				 ;Initialising score with 0 
+ 9295 320183    	STA 8301H
                 
- 9366 3E05      	MVI A,05H                    ;Iniatialsing penalty with 0
- 9368 320084    	STA 8400H
+ 9298 3E05      	MVI A,05H                    ;Iniatialsing penalty with 0
+ 929A 320084    	STA 8400H
                 
- 936B 3E9F      	MVI A,9FH                    ;Value of m stored in 8204 and 8205.
- 936D 320482    	STA 8204H
+ 929D 3E9F      	MVI A,9FH                    ;Value of m stored in 8204 and 8205.
+ 929F 320482    	STA 8204H
                 
- 9370 3E26      	MVI A,26H
- 9372 320582    	STA 8205H
+ 92A2 3E26      	MVI A,26H
+ 92A4 320582    	STA 8205H
                 
- 9375 3E1C      	MVI A,1CH
- 9377 321082    	STA 8210H
+ 92A7 3E1C      	MVI A,1CH
+ 92A9 321082    	STA 8210H
                 
- 937A 3E00      	MVI A,00H
- 937C 321182    	STA 8211H
- 937F C9        	RET	
+ 92AC 3E00      	MVI A,00H
+ 92AE 321182    	STA 8211H
+ 92B1 C9        	RET	
                 
- 9380           INITIAL:						; initialsing at 28 continous location the value of numbers chosen 2 at a time.
- 9380 3E03      		MVI A,03H
- 9382 320185    		STA 8501H
+ 92B2           INITIAL:						; initialsing at 28 continous location the value of numbers chosen 2 at a time.
+ 92B2 3E03      		MVI A,03H
+ 92B4 320185    		STA 8501H
                 
- 9385 3E05      		MVI A,05H
- 9387 320285    		STA 8502H
+ 92B7 3E05      		MVI A,05H
+ 92B9 320285    		STA 8502H
                 
- 938A 3E09      		MVI A,09H
- 938C 320385    		STA 8503H
+ 92BC 3E09      		MVI A,09H
+ 92BE 320385    		STA 8503H
                 
- 938F 3E11      		MVI A,11H
- 9391 320485    		STA 8504H
+ 92C1 3E11      		MVI A,11H
+ 92C3 320485    		STA 8504H
                 
- 9394 3E21      		MVI A,21H
- 9396 320585    		STA 8505H
+ 92C6 3E21      		MVI A,21H
+ 92C8 320585    		STA 8505H
                 
- 9399 3E41      		MVI A,41H
- 939B 320685    		STA 8506H
+ 92CB 3E41      		MVI A,41H
+ 92CD 320685    		STA 8506H
                 
- 939E 3E81      		MVI A,81H
- 93A0 320785    		STA 8507H
+ 92D0 3E81      		MVI A,81H
+ 92D2 320785    		STA 8507H
                 
- 93A3 3E06      		MVI A,06H
- 93A5 320885    		STA 8508H
+ 92D5 3E06      		MVI A,06H
+ 92D7 320885    		STA 8508H
                 
- 93A8 3E0A      		MVI A,0AH
- 93AA 320985    		STA 8509H
+ 92DA 3E0A      		MVI A,0AH
+ 92DC 320985    		STA 8509H
                 
- 93AD 3E12      		MVI A,12H
- 93AF 321085    		STA 8510H
+ 92DF 3E12      		MVI A,12H
+ 92E1 321085    		STA 8510H
                 
- 93B2 3E22      		MVI A,22H
- 93B4 321185    		STA 8511H
+ 92E4 3E22      		MVI A,22H
+ 92E6 321185    		STA 8511H
                 
- 93B7 3E42      		MVI A,42H
- 93B9 321285    		STA 8512H
+ 92E9 3E42      		MVI A,42H
+ 92EB 321285    		STA 8512H
                 
- 93BC 3E82      		MVI A,82H
- 93BE 321385    		STA 8513H
+ 92EE 3E82      		MVI A,82H
+ 92F0 321385    		STA 8513H
                 
- 93C1 3E0C      		MVI A,0CH
- 93C3 321485    		STA 8514H
+ 92F3 3E0C      		MVI A,0CH
+ 92F5 321485    		STA 8514H
                 
- 93C6 3E14      		MVI A,14H
- 93C8 321585    		STA 8515H
+ 92F8 3E14      		MVI A,14H
+ 92FA 321585    		STA 8515H
                 
- 93CB 3E24      		MVI A,24H
- 93CD 321685    		STA 8516H
+ 92FD 3E24      		MVI A,24H
+ 92FF 321685    		STA 8516H
                 
- 93D0 3E44      		MVI A,44H
- 93D2 321785    		STA 8517H
+ 9302 3E44      		MVI A,44H
+ 9304 321785    		STA 8517H
                 
- 93D5 3E84      		MVI A,84H
- 93D7 321885    		STA 8518H
+ 9307 3E84      		MVI A,84H
+ 9309 321885    		STA 8518H
                 
- 93DA 3E18      		MVI A,18H
- 93DC 321985    		STA 8519H
+ 930C 3E18      		MVI A,18H
+ 930E 321985    		STA 8519H
                 
- 93DF 3E28      		MVI A,28H
- 93E1 322085    		STA 8520H
+ 9311 3E28      		MVI A,28H
+ 9313 322085    		STA 8520H
                 
- 93E4 3E48      		MVI A,48H
- 93E6 322185    		STA 8521H
+ 9316 3E48      		MVI A,48H
+ 9318 322185    		STA 8521H
                 
- 93E9 3E88      		MVI A,88H
- 93EB 322285    		STA 8522H
+ 931B 3E88      		MVI A,88H
+ 931D 322285    		STA 8522H
                 
- 93EE 3E30      		MVI A,30H
- 93F0 322385    		STA 8523H
+ 9320 3E30      		MVI A,30H
+ 9322 322385    		STA 8523H
                 
- 93F3 3E50      		MVI A,50H
- 93F5 322485    		STA 8524H
+ 9325 3E50      		MVI A,50H
+ 9327 322485    		STA 8524H
                 
- 93F8 3E90      		MVI A,90H
- 93FA 322585    		STA 8525H
+ 932A 3E90      		MVI A,90H
+ 932C 322585    		STA 8525H
                 
- 93FD 3E60      		MVI A,60H
- 93FF 322685    		STA 8526H
+ 932F 3E60      		MVI A,60H
+ 9331 322685    		STA 8526H
                 
- 9402 3EA0      		MVI A,0A0H
- 9404 322785    		STA 8527H
+ 9334 3EA0      		MVI A,0A0H
+ 9336 322785    		STA 8527H
                 
- 9407 3EC0      		MVI A,0C0H
- 9409 322885    		STA 8528H
+ 9339 3EC0      		MVI A,0C0H
+ 933B 322885    		STA 8528H
                 
- 940C 3E1F      		MVI A,1FH
- 940E 322985    		STA 8529H
+ 933E 3E1F      		MVI A,1FH
+ 9340 322985    		STA 8529H
                 
- 9411 3E2F      		MVI A,2FH
- 9413 323085    		STA 8530H
+ 9343 3E2F      		MVI A,2FH
+ 9345 323085    		STA 8530H
                 
- 9416 3E3F      		MVI A,3FH
- 9418 323185    		STA 8531H
+ 9348 3E3F      		MVI A,3FH
+ 934A 323185    		STA 8531H
                 
- 941B 3E4F      		MVI A,4FH
- 941D 323285    		STA 8532H
+ 934D 3E4F      		MVI A,4FH
+ 934F 323285    		STA 8532H
                 
- 9420 3E5F      		MVI A,5FH
- 9422 323385    		STA 8533H
+ 9352 3E5F      		MVI A,5FH
+ 9354 323385    		STA 8533H
                 
- 9425 3E6F      		MVI A,6FH
- 9427 323485    		STA 8534H
+ 9357 3E6F      		MVI A,6FH
+ 9359 323485    		STA 8534H
                 
- 942A 3E7F      		MVI A,7FH
- 942C 323585    		STA 8535H
+ 935C 3E7F      		MVI A,7FH
+ 935E 323585    		STA 8535H
                 
- 942F 3E8F      		MVI A,8FH
- 9431 323685    		STA 8536H
+ 9361 3E8F      		MVI A,8FH
+ 9363 323685    		STA 8536H
                 
- 9434 3E9F      		MVI A,9FH
- 9436 323785    		STA 8537H
+ 9366 3E9F      		MVI A,9FH
+ 9368 323785    		STA 8537H
                 
- 9439 3EAF      		MVI A,0AFH
- 943B 323885    		STA 8538H
+ 936B 3EAF      		MVI A,0AFH
+ 936D 323885    		STA 8538H
                 
- 943E 3EBF      		MVI A,0BFH
- 9440 323985    		STA 8539H
+ 9370 3EBF      		MVI A,0BFH
+ 9372 323985    		STA 8539H
                 
- 9443 3ECF      		MVI A,0CFH
- 9445 324085    		STA 8540H
+ 9375 3ECF      		MVI A,0CFH
+ 9377 324085    		STA 8540H
                 
- 9448 3EDF      		MVI A,0DFH
- 944A 324185    		STA 8541H
+ 937A 3EDF      		MVI A,0DFH
+ 937C 324185    		STA 8541H
                 
- 944D 3EEF      		MVI A,0EFH
- 944F 324285    		STA 8542H
+ 937F 3EEF      		MVI A,0EFH
+ 9381 324285    		STA 8542H
                 
- 9452 3EFF      		MVI A,0FFH
- 9454 324385    		STA 8543H
+ 9384 3EFF      		MVI A,0FFH
+ 9386 324385    		STA 8543H
                 
- 9457 3E0E      		MVI A,0EH
- 9459 324485    		STA 8544H
+ 9389 3E0E      		MVI A,0EH
+ 938B 324485    		STA 8544H
                 
- 945C 3E1E      		MVI A,1EH
- 945E 324585    		STA 8545H
+ 938E 3E1E      		MVI A,1EH
+ 9390 324585    		STA 8545H
                 
- 9461 3E2E      		MVI A,2EH
- 9463 324685    		STA 8546H
+ 9393 3E2E      		MVI A,2EH
+ 9395 324685    		STA 8546H
                 
- 9466 3E3E      		MVI A,3EH
- 9468 324785    		STA 8547H
+ 9398 3E3E      		MVI A,3EH
+ 939A 324785    		STA 8547H
                 
- 946B 3E4E      		MVI A,4EH
- 946D 324885    		STA 8548H
+ 939D 3E4E      		MVI A,4EH
+ 939F 324885    		STA 8548H
                 
- 9470 3E5E      		MVI A,5EH
- 9472 324985    		STA 8549H
+ 93A2 3E5E      		MVI A,5EH
+ 93A4 324985    		STA 8549H
                 
- 9475 3E6E      		MVI A,6EH
- 9477 325085    		STA 8550H
+ 93A7 3E6E      		MVI A,6EH
+ 93A9 325085    		STA 8550H
                 
- 947A 3E7E      		MVI A,7EH
- 947C 325185    		STA 8551H
+ 93AC 3E7E      		MVI A,7EH
+ 93AE 325185    		STA 8551H
                 
- 947F 3E8E      		MVI A,8EH
- 9481 325285    		STA 8552H
+ 93B1 3E8E      		MVI A,8EH
+ 93B3 325285    		STA 8552H
                 
- 9484 3E9E      		MVI A,9EH
- 9486 325385    		STA 8553H
+ 93B6 3E9E      		MVI A,9EH
+ 93B8 325385    		STA 8553H
                 
- 9489 3EAE      		MVI A,0AEH
- 948B 325485    		STA 8554H
+ 93BB 3EAE      		MVI A,0AEH
+ 93BD 325485    		STA 8554H
                 
- 948E 3EBE      		MVI A,0BEH
- 9490 325585    		STA 8555H
+ 93C0 3EBE      		MVI A,0BEH
+ 93C2 325585    		STA 8555H
                 
- 9493 3ECE      		MVI A,0CEH
- 9495 325685    		STA 8556H
+ 93C5 3ECE      		MVI A,0CEH
+ 93C7 325685    		STA 8556H
                 
- 9498 C9        		RET
- 9499           	END
-0007  A                    92C1  ADDR                 92D4  ADDRI         
-0000  B                    0001  C                    9238  CALCULATE     
-90D2  CHECK                02BE  CLEAR                8FEF  CURAD         
-8FF1  CURDT                0002  D                    934A  DELAY         
-9201  DISPLAY              0003  E                    92AF  EIGHTH        
-927C  FIFTH                926B  FOURTH               92E7  GENERATE_RAN  
-030E  GTHEX                0004  H                    034F  HXDSP         
-90EF  INC                  9380  INITIAL              935C  INITIALIZE    
-9351  INLOOP               003C  KBINT                0005  L             
-92D0  LABEL1               92E3  LABEL13              9309  LABEL3        
-92C0  LAST                 9167  LEVEL1               9194  LEVEL2        
-9091  LEVEL2_INIT          9329  LOOP1                9345  LOOP11        
-931C  LOOP2                9338  LOOP21               9055  LOOP_DECREASE 
-9102  L_DEC                0006  M                    9312  MOD1          
-932E  MOD2                 92FF  MULTIPLY             904E  NOT_INCREASE  
-90FA  N_INC                934E  OUTLOOP              0389  OUTPUT        
-03BA  RDKBD                91C1  SCORE                9249  SECOND        
-929E  SEVENTH              928D  SIXTH                901E  START         
-9099  START1               9111  STOP                 90E1  TEMP          
-925A  THIRD                0440  UPDAD                044C  UPDDT         
+ 93CA C9        		RET
+ 93CB           	END
+0007  A                    91F3  ADDR                 9206  ADDRI         
+0000  B                    0001  C                    91D6  CALCULATE     
+02BE  CLEAR                8FEF  CURAD                8FF1  CURDT         
+0002  D                    927C  DELAY                919F  DISPLAY       
+0003  E                    9219  GENERATE_RAN         030E  GTHEX         
+0004  H                    034F  HXDSP                92B2  INITIAL       
+928E  INITIALIZE           9283  INLOOP               003C  KBINT         
+0005  L                    9202  LABEL1               9215  LABEL13       
+923B  LABEL3               91F2  LAST                 91D8  LCALC         
+9105  LEVEL1               9132  LEVEL2               9051  LMAO          
+9053  LMAO2                90A7  LOL2                 909F  LOLOL         
+925B  LOOP1                9277  LOOP11               924E  LOOP2         
+926A  LOOP21               9068  LOOP_DECREASE        0006  M             
+9244  MOD1                 9260  MOD2                 9231  MULTIPLY      
+9061  NOT_INCREASE         9280  OUTLOOP              0389  OUTPUT        
+03BA  RDKBD                915F  SCORE                9023  START         
+90AF  STOP                 91E7  TEMP2                0440  UPDAD         
+044C  UPDDT                
 
