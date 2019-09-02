@@ -1,0 +1,389 @@
+ 0000           cpu "8085.tbl"
+ 0000           hof "int8"
+                
+ 9000           org 9000h
+                
+ 030E =         GTHEX: EQU 030EH
+                
+ 8FF1 =         CURDT: EQU 8FF1H
+ 044C =         UPDDT: EQU 044cH
+                
+                ;Square/Triangular/Sawtooth/Staircase/Symmetrical Staircase
+ 9000 CD6D91    CALL SINEVAL
+                
+                
+ 9003 3E00      MVI A,00H
+ 9005 32F18F    STA CURDT ; initially display 0000 on address field
+ 9008 CD4C04    CALL UPDDT
+                
+ 900B 3E00      MVI A,00H
+ 900D 0601      MVI B,01H
+ 900F CD0E03    CALL GTHEX
+                ; RST 5
+ 9012 1600      MVI D,00H
+ 9014 EB        XCHG
+ 9015 224288    SHLD 8842H
+ 9018 218084    LXI H,8480H
+ 901B 224088    SHLD 8840H
+ 901E CD4C91    CALL DIV
+                ; LHLD 8902H
+                ; DCX H
+                ; DCX H
+                ; SHLD 8840H
+                
+                
+ 9021 3E80      MVI A,80H
+ 9023 D343      OUT 43H
+                
+ 9025 3E8B      MVI A,8BH
+ 9027 D303      OUT 03H
+                
+ 9029 DB01      IN 01H
+                
+                
+ 902B FE80      CPI 80H
+ 902D CA6990    JZ SQUARE
+ 9030 FE10      CPI 10H
+ 9032 CA7690    JZ TRIANGULAR
+ 9035 FE08      CPI 08H
+ 9037 CAA390    JZ SAWTOOTH
+ 903A FE40      CPI 40H
+ 903C CAC890    JZ STAIRCASE
+ 903F FE20      CPI 20H
+ 9041 CAEB90    JZ SYMSTAIRCASE
+ 9044 FE04      CPI 04H
+ 9046 CA1691    JZ SINE
+ 9049 C34B91    JMP OVER
+                
+                ; DELAY2:
+                ; 	MVI L,0F8H
+                ; 	L3:
+                ; 		DCR L
+                ; 		PUSH PSW
+                ; 		POP PSW
+                ; 		OUT 40H
+                ; 		JNZ L3
+                ; 	RET
+                
+ 904C           DELAY:
+ 904C 2A0289    		LHLD 8902H
+                		; LXI H,0FFFFH 
+ 904F 24        		INR H
+ 9050 25        		DCR H
+ 9051 CA6090    		JZ L4
+ 9054           		L1:
+ 9054           			L2:
+ 9054 F5        				PUSH PSW
+ 9055 F1        				POP PSW
+ 9056 D340      				OUT 40H
+ 9058 2D        				DCR L
+ 9059 C25490    			JNZ L2
+ 905C 25        		DCR H
+ 905D C25490    		JNZ L1
+                		; RET
+                
+ 9060           		L4:
+ 9060 F5        			PUSH PSW
+ 9061 F1        			POP PSW
+ 9062 D340      			OUT 40H
+ 9064 2D        			DCR L
+ 9065 C26090    		JNZ L4
+                
+ 9068 C9        	RET
+                
+                
+ 9069           SQUARE:
+ 9069 3E00      MVI A,00H
+ 906B CD4C90    CALL DELAY
+                
+ 906E 3EFF      MVI A,0FFH
+ 9070 CD4C90    CALL DELAY
+                
+ 9073 C36990    JMP SQUARE
+                
+                
+ 9076           TRIANGULAR:
+ 9076 216300    LXI H, 0063H
+ 9079 224288    SHLD 8842H
+                
+ 907C 2A0289    LHLD 8902H
+ 907F 224088    SHLD 8840H
+                
+ 9082 CD4C91    CALL DIV
+                
+ 9085 2AC622    LHLD 8902
+                
+ 9088           TRIANGULARTEMP:
+                
+ 9088 3E00      MVI A,00H
+ 908A 0663      MVI B, 63H
+ 908C           TLOOP1:
+ 908C CD4C90    	CALL DELAY
+ 908F C602      	ADI 02H
+ 9091 05        	DCR B
+ 9092 C28C90    	JNZ TLOOP1
+                
+ 9095 0663      MVI B, 63H
+ 9097           TLOOP2:
+ 9097 CD4C90    	CALL DELAY
+ 909A DE02      	SBI 02H
+ 909C 05        	DCR B
+ 909D C29790    	JNZ TLOOP2
+                
+ 90A0 C38890    JMP TRIANGULARTEMP
+                
+                
+                
+ 90A3           SAWTOOTH:
+ 90A3 216300    LXI H, 0063H
+ 90A6 224288    SHLD 8842H
+                
+ 90A9 2A0289    LHLD 8902H
+ 90AC 224088    SHLD 8840H
+                
+ 90AF CD4C91    CALL DIV
+                
+ 90B2           SAWTOOTHTEMP:
+ 90B2 3E00      MVI A,00H
+ 90B4 0663      MVI B,063H
+ 90B6           SAWTEMP:
+ 90B6 CD4C90    CALL DELAY
+ 90B9 CD4C90    CALL DELAY
+ 90BC C602      ADI 02H
+ 90BE 05        DCR B
+ 90BF C2B690    JNZ SAWTEMP
+                
+                
+ 90C2 78        MOV A,00H
+ 90C3 D340      OUT 40H
+ 90C5 C3B290    JMP SAWTOOTHTEMP
+                
+                
+ 90C8           STAIRCASE:
+ 90C8 2A0289    LHLD 8902H
+                ; DAD H
+ 90CB 224088    SHLD 8840H
+ 90CE 210700    LXI H, 0007H
+ 90D1 224288    SHLD 8842H
+ 90D4 CD4C91    CALL DIV
+                
+ 90D7 3E00      MVI A,00H
+ 90D9           STAIRTEMP:
+                
+ 90D9 CD4C90    CALL DELAY
+ 90DC CD4C90    CALL DELAY
+                
+ 90DF C620      ADI 20H
+ 90E1 FEE0      CPI 0E0H
+ 90E3 C2D990    JNZ STAIRTEMP
+                
+                
+ 90E6 3E00      MVI	A, 00H
+ 90E8 C3D990    JMP STAIRTEMP
+                
+                
+                
+ 90EB           SYMSTAIRCASE:
+ 90EB 2A0289    LHLD 8902H
+ 90EE 224088    SHLD 8840H
+ 90F1 210700    LXI H, 0007H
+ 90F4 224288    SHLD 8842H
+ 90F7 CD4C91    CALL DIV
+                
+ 90FA 3E00      MVI A,00H
+ 90FC           SYMSTAIRTEMP:
+                
+ 90FC CD4C90    CALL DELAY
+                ; MVI B,11H
+                ; SYMSTAIRDELAY:
+                ; OUT 40H
+                ; DCR B
+                ; JNZ SYMSTAIRDELAY
+                
+ 90FF C620      ADI 20H
+ 9101 FEE0      CPI 0E0H
+ 9103 C2FC90    JNZ SYMSTAIRTEMP
+                
+ 9106 DE20      SBI 20H
+ 9108           SYMSTAIRTEMP2:
+                
+ 9108 CD4C90    CALL DELAY
+                ; MVI B,11H
+                ; SYMSTAIRDELAY2:
+                ; OUT 40H
+                ; DCR B
+                ; JNZ SYMSTAIRDELAY2
+                
+ 910B DE20      SBI 20H
+ 910D C20891    JNZ SYMSTAIRTEMP2
+                
+ 9110 CD4C90    CALL DELAY
+ 9113 C3FC90    JMP SYMSTAIRTEMP
+                
+                
+                
+ 9116           SINE:
+                
+ 9116 2A0289    LHLD 8902H
+ 9119 224088    SHLD 8840H
+ 911C 212400    LXI H, 0024H
+ 911F 224288    SHLD 8842H
+ 9122 CD4C91    CALL DIV
+                
+ 9125           SINETEMP:
+                
+ 9125 1624      MVI D,24H
+ 9127 210080    LXI H,8000H
+                
+ 912A           POSHALF:
+ 912A 7E        MOV A,M
+                ; OUT 40H
+ 912B 44        MOV B,H
+ 912C 4D        MOV C,L
+ 912D CD4C90    CALL DELAY
+ 9130 60        MOV H,B
+ 9131 69        MOV L,C
+ 9132 23        INX H
+ 9133 15        DCR D
+ 9134 C22A91    JNZ POSHALF
+ 9137 3E24      MVI A,24H
+                
+ 9139 1624      MVI D,24H
+ 913B           NEGHALF:
+ 913B 2B        DCX H
+ 913C 7E        MOV A,M
+ 913D 44        MOV B,H
+ 913E 4D        MOV C,L
+ 913F CD4C90    CALL DELAY
+ 9142 60        MOV H,B
+ 9143 69        MOV L,C
+                ; OUT 40H
+ 9144 15        DCR D
+ 9145 C23B91    JNZ NEGHALF
+ 9148 C32591    JMP SINETEMP
+                
+                
+                
+                
+ 914B           OVER:
+ 914B EF        RST 5
+                
+                
+                
+ 914C           DIV:
+ 914C 010000    	LXI B, 0000H 
+ 914F 2A4288    	LHLD 8842h ; load first number(dividend) in h-l register pair from 8842h(lower 8 bits) and 8843h(higher 8 bits)
+ 9152 EB        	XCHG ; swap content of d-e and h-l
+ 9153 2A4088    	LHLD 8840h ; load second number(divisor) in h-l register pair from 8840h(lower 8 bits) and 8841h(higher 8 bits)
+ 9156           	LBL2:
+ 9156 7D        	MOV A, L 
+ 9157 93        	SUB E ; l-e
+ 9158 6F        	MOV L, A ; store l-e in l
+ 9159 7C        	MOV A, H
+ 915A 9A        	SBB D ; h-d (with borrow if any)
+ 915B 67        	MOV H, A ; store h-d in h
+ 915C DA6391    	JC LBL ; if carry triggered it means de>hl and we need to end
+ 915F 03        	INX B ; else increment quotient
+ 9160 C35691    	JMP LBL2 ; loop back to LBL2
+ 9163           	LBL:
+ 9163 19        	DAD D ; we need to add de since an extra subtraction will be done in the last iteration of loop
+ 9164 220089    	SHLD 8900h ; h-l stores remainder and it is moved to location 8900h(lower 8 bits) and 8901h(higher 8 bits)
+ 9167 69        	MOV L, C
+ 9168 60        	MOV H, B
+ 9169 220289    	SHLD 8902h ; ; b-c stores quotient and it is moved to location 8902h(lower 8 bits) and 8903h(higher 8 bits)
+ 916C C9        	RET
+                
+                
+ 916D           SINEVAL:
+ 916D 3E00      MVI A, 00H
+ 916F 320080    STA 8000H
+ 9172 3E01      MVI A, 01H
+ 9174 320180    STA 8001H
+ 9177 3E02      MVI A, 02H
+ 9179 320280    STA 8002H
+ 917C 3E04      MVI A, 04H
+ 917E 320380    STA 8003H
+ 9181 3E08      MVI A, 08H
+ 9183 320480    STA 8004H
+ 9186 3E11      MVI A, 11H
+ 9188 320580    STA 8005H
+ 918B 3E17      MVI A, 17H
+ 918D 320680    STA 8006H
+ 9190 3E1E      MVI A, 1EH
+ 9192 320780    STA 8007H
+ 9195 3E25      MVI A, 25H
+ 9197 320880    STA 8008H
+ 919A 3E2D      MVI A, 2DH
+ 919C 320980    STA 8009H
+ 919F 3E36      MVI A, 36H
+ 91A1 320A80    STA 800AH
+ 91A4 3E40      MVI A, 40H
+ 91A6 320B80    STA 800BH
+ 91A9 3E49      MVI A, 49H
+ 91AB 320C80    STA 800CH
+ 91AE 3E54      MVI A, 54H
+ 91B0 320D80    STA 800DH
+ 91B3 3E5E      MVI A, 5EH
+ 91B5 320E80    STA 800EH
+ 91B8 3E69      MVI A, 69H
+ 91BA 320F80    STA 800FH
+ 91BD 3E74      MVI A, 74H
+ 91BF 321080    STA 8010H
+ 91C2 3E7F      MVI A, 7FH
+ 91C4 321180    STA 8011H
+ 91C7 3E84      MVI A, 84H
+ 91C9 321280    STA 8012H
+ 91CC 3E95      MVI A, 95H
+ 91CE 321380    STA 8013H
+ 91D1 3E9F      MVI A, 9FH
+ 91D3 321480    STA 8014H
+ 91D6 3EAF      MVI A, 0AFH
+ 91D8 321580    STA 8015H
+ 91DB 3EB4      MVI A, 0B4H
+ 91DD 321680    STA 8016H
+ 91E0 3EC0      MVI A, 0C0H
+ 91E2 321780    STA 8017H
+ 91E5 3EC8      MVI A, 0C8H
+ 91E7 321880    STA 8018H
+ 91EA 3ED0      MVI A, 0D0H
+ 91EC 321980    STA 8019H
+ 91EF 3ED8      MVI A, 0D8H
+ 91F1 321A80    STA 801AH
+ 91F4 3EE0      MVI A, 0E0H
+ 91F6 321B80    STA 801BH
+ 91F9 3EEA      MVI A, 0EAH
+ 91FB 321C80    STA 801CH
+ 91FE 3EED      MVI A, 0EDH
+ 9200 321D80    STA 801DH
+ 9203 3EEF      MVI A, 0EFH
+ 9205 321E80    STA 801EH
+ 9208 3EF2      MVI A, 0F2H
+ 920A 321F80    STA 801FH
+ 920D 3EF9      MVI A, 0F9H
+ 920F 322080    STA 8020H
+ 9212 3EFC      MVI A, 0FCH
+ 9214 322180    STA 8021H
+ 9217 3EFD      MVI A, 0FDH
+ 9219 322280    STA 8022H
+ 921C 3EFF      MVI A, 0FFH
+ 921E 322380    STA 8023H
+ 9221 3E00      MVI A, 00H
+ 9223 322480    STA 8024H
+                
+                
+ 9226 C9        RET
+ 9227           	END
+0007  A                    0000  B                    0001  C             
+8FF1  CURDT                0002  D                    904C  DELAY         
+914C  DIV                  0003  E                    030E  GTHEX         
+0004  H                    0005  L                    9054  L1            
+9054  L2                   9060  L4                   9163  LBL           
+9156  LBL2                 0006  M                    913B  NEGHALF       
+914B  OVER                 912A  POSHALF              90B6  SAWTEMP       
+90A3  SAWTOOTH             90B2  SAWTOOTHTEMP         9116  SINE          
+9125  SINETEMP             916D  SINEVAL              9069  SQUARE        
+90C8  STAIRCASE            90D9  STAIRTEMP            90EB  SYMSTAIRCASE  
+90FC  SYMSTAIRTEMP         9108  SYMSTAIRTEMP2        908C  TLOOP1        
+9097  TLOOP2               9076  TRIANGULAR           9088  TRIANGULARTEMP
+044C  UPDDT                
+
