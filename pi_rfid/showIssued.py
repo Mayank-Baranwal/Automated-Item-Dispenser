@@ -54,6 +54,7 @@ def issueItems(rfID):
 			pass # Check for Proximity Sensor #
 			# IF PROXIMITY Doesn't reply in 10s CALL FAILURE #
 			status = ultrasonic.foo()
+			#status = 2
 			if status == 0:
 				print('Could not dispense item!')
 				issueNext = False
@@ -120,7 +121,9 @@ def menu():
 		print("2->Instructor")
 		print("3->Exit")
 		#later change to matrix keypad
+		
 		val= int(input())
+		
 		if val==1:
 			#student
 			rfID = readRFID()

@@ -1,6 +1,7 @@
 #Libraries
 import RPi.GPIO as GPIO
 import time
+#GPIO.setwarnings(False)
     
 
 def distance():
@@ -61,16 +62,20 @@ def foo():
 		for _ in range(0,10):
 			dist = distance()
 			print ("Measured Distance = %.1f cm" % dist)
+			
 			if dist < 20:
 				item_dispatched = True
 			elif item_dispatched :
 				item_picked = True
 				return 2
+				
 			time.sleep(1)
 
-		if item_dispatched : return 1
-		else: return 0
+		return item_dispatched
+		
+		
 	# Reset by pressing CTRL + C
 	except KeyboardInterrupt:
 		print("Measurement stopped by User")
-		#GPIO.cleanup()
+		GPIO.cleanup()
+
