@@ -5,14 +5,35 @@ from mfrc522 import SimpleMFRC522
 import json
 import time
 import ultrasonic
+import color
+import keypad
+from keypad import input
+import servo
 
-reader = SimpleMFRC522()
 fileName = "database.txt"
 PASSWORD=5
+
+item = {
+	"WHITE" : "BreadBoard",
+	"GREEN": "IC 781",
+	"BLUE": "LED Strip",
+}
+
+
+''' TODO: To add item here '''
+def addItem():
+	print("Scan item in front of colour sensor")
+	time.sleep(2) # Wait for 2 seconds #
+	addedItem = color.getColour()
+	pass # INCREMENT COUNT HERE #
+	print("Added Item", item[addedItem])
+	
+
 
 
 def readRFID():
 	try:
+		reader = SimpleMFRC522()
 		id, text = reader.read()
 	finally:
 		GPIO.cleanup()
@@ -103,15 +124,17 @@ def professor():
 		if val==1:
 			setIssueValues(3)
 		if val==2:
-			print("Add numbe of items to be inserted")
-			count=int(input())
+			print("Add number of items to be inserted")
+			count=int(input()) # INPUT THE NUMBER OF ITEMS TO BE ADDED #
+			servo.openDoor()
 			for i in range(0,count):
-				#check colour sensor
-				#increase total count
-				print("Inserted item", i)
-			print()
+				addItem()
+				pass # OPTIONALLY WAIT FOR 4-5s #
+			time.sleep(5)
+			servo.closeDoor() 
 		if val==3:
 			break
+			
 	return
 
 def menu():
@@ -145,12 +168,3 @@ def menu():
 	return
 
 menu()
-#rfID = readRFID()
-#tobeIssued = [0,0,0]
-#currIssued = [0,0,0]
-
-#writeRecord(rfID,tobeIssued,currIssued)
-
-# issueItems(rfID)
-
-#setIssueValues(3)
