@@ -19,6 +19,8 @@ halfstep_seq = [
   [1,0,0,1]
 ]
 
+halfstep_seq.reverse()
+
 while(4):
 	for halfstep in range(8):
 		for pin in range(4):
