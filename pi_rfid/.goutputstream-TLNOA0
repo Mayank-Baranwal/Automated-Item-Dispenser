@@ -42,16 +42,13 @@ def changeCount(itemNumber,flag):
 	
 	with open(countFile,'w') as f:
 		json.dump(data,f)
-	
-	return
 
 def addItem():
 	print("Scan item in front of colour sensor")
 	time.sleep(2) # Wait for 2 seconds #
 	addedItem = color.getColour()
 	pass # INCREMENT COUNT HERE #
-	val=itemNum[addedItem]
-	changeCount(val,0)
+	changeCount(itemNum[addItem],0)
 	print("Added Item", item[addedItem])
 	
 
@@ -111,13 +108,11 @@ def issueItems(rfID):
 				tobeIssued[i] -= 1
 				currIssued[i] += 1
 				issueNext = False
-				changeCount(i,1)
 				break
 			else:
 				print("Issued item " , str(i) )
 				tobeIssued[i] -= 1
 				currIssued[i] += 1
-				changeCount(i,1)
 				time.sleep(2)
 	
 		if not issueNext: break
