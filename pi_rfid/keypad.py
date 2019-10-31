@@ -2,30 +2,7 @@ from pad4pi import rpi_gpio
 import time
 
 
-class Keypad:
-	def returnInput(self):
-		temp = self.buff
-		self.buff = ""
-		#self.endOfInput = False
-		print()
-		return temp
-	
-	def registerInput(self,key):
-		if(self.endOfInput):
-			return 
-		
-		if(key == '*'):
-			self.endOfInput = True
-			return
-			
-		if(key == 'B'):
-			self.buff = self.buff[0:-1]
-			print("\b \b",end = "", flush=True)
-			return
-		
-		print(key,end="",flush=True)
-		self.buff += key
-	
+class myKeypad:
 	def __init__(self):
 		self.KEYPAD = [
 			["1","2","3","A"],
@@ -42,23 +19,54 @@ class Keypad:
 		self.factory = rpi_gpio.KeypadFactory()
 		self.keypad = self.factory.create_keypad(keypad=self.KEYPAD, row_pins=self.ROW_PINS, col_pins=self.COL_PINS)
 		self.keypad.registerKeyPressHandler(self.registerInput)
+		#print("Object Created")
 		return
 	
+	
+	def returnInput(self):
+		temp = self.buff
+		self.buff = ""
+		self.endOfInput = False
+		print()
+		return temp
+	
+	def registerInput(self,key):
+		if(self.endOfInput):
+			return 
+		
+		if(key == '*'):
+			if(self.buff != ""):
+				self.endOfInput = True
+				return
+			
+		if(key == 'B'):
+			self.buff = self.buff[0:-1]
+			print("\b \b",end = "", flush=True)
+			return
+		
+		print(key,end="",flush=True)
+		self.buff += key
+	
 	def __del__(self):
+		#print("Object Destroyed")
 		self.keypad.cleanup()
+		self.keypad.clearKeyPressHandlers()
 		return 
 
 
 ''' Keypad k is not destructing '''
 def input():
-	kp = Keypad()
+	kp = myKeypad()
 	
 	while(kp.endOfInput == False):
 		pass
 		
 	ip = kp.returnInput()
 	kp.__del__()
-	del kp
+	#del kp
 	
 	return ip
 
+
+
+input()
