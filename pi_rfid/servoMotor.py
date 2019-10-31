@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 
 GPIO.setmode(GPIO.BOARD)
-control_pins = [7,11,13,15]
+control_pins = [3,5,7,8]
 
 for pin in control_pins:
   GPIO.setup(pin, GPIO.OUT)
@@ -19,7 +19,7 @@ halfstep_seq = [
   [1,0,0,1]
 ]
 
-for i in range(512):
+while(4):
 	for halfstep in range(8):
 		for pin in range(4):
 			GPIO.output(control_pins[pin], halfstep_seq[halfstep][pin])
