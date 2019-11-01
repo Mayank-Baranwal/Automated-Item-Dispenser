@@ -79,3 +79,5 @@ def foo():
 		print("Measurement stopped by User")
 		GPIO.cleanup()
 
+
+foo()

@@ -19,7 +19,6 @@ class myKeypad:
 		self.factory = rpi_gpio.KeypadFactory()
 		self.keypad = self.factory.create_keypad(keypad=self.KEYPAD, row_pins=self.ROW_PINS, col_pins=self.COL_PINS)
 		self.keypad.registerKeyPressHandler(self.registerInput)
-		#print("Object Created")
 		return
 	
 	
@@ -67,6 +66,3 @@ def input():
 	
 	return ip
 
-
-
-input()

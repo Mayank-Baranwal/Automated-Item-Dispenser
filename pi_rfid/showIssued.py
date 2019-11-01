@@ -6,12 +6,15 @@ import json
 import time
 import ultrasonic
 import color
-#import keypad 
-#from keypad import input
+import keypad 
+from keypad import input
 import servo
+import sendMessage
+import stepperMotor
 
 fileName = "database.txt"
 countFile="totalCount.txt"
+topic = "topic/Dispenser"
 PASSWORD=5
 
 item = {
@@ -26,14 +29,21 @@ itemNum = {
 	"BLUE": 2,
 }
 
-def changeCount(itemNumber,flag):
+def getAllCounts():
 	data = {}
 	with open(countFile) as f:
 		try:
 			data = json.load(f)
 		except Exception as e:
 			data = {}
-	temp=data["total"]
+	count=data["total"]
+	return count
+	
+
+def changeCount(itemNumber,flag):
+	temp = getAllCounts()
+	data = {}
+	
 	if flag==0:
 		temp[itemNumber]+=1
 	else:
@@ -90,13 +100,17 @@ def readRecord(rfID):
 	return data[rfID]
 
 def issueItems(rfID):
-	tobeIssued, currIssued, groupNo = readRecord(rfID)
+	tobeIssued, currIssued, groupNo = readRecord(rfID) 
 	issueNext = True
 	for i,itemCount in enumerate(tobeIssued):
 		if(itemCount <= 0):
 			continue
 		
 		for _ in range(0,itemCount):
+			allCounts = getAllCounts()
+			if(allCounts[i] <= 0):
+				sendMessage.publishMessage("Low Inventory " + str(i), topic)
+				break
 			pass # Call for a rotation #
 			print('Pick item after it is dispensed.')
 			# IF PROXIMITY Doesn't reply in 10s CALL FAILURE #
@@ -104,10 +118,12 @@ def issueItems(rfID):
 			#status = 2
 			if status == 0:
 				print('Could not dispense item!')
+				sendMessage.publishMessage("Dispensing Failed " + str(i),topic)
 				issueNext = False
 				break
 			elif status == 1:
 				print('Item dipensed but not picked up!')
+				sendMessage.publishMessage("Pickup Failed " + str(i),topic)
 				tobeIssued[i] -= 1
 				currIssued[i] += 1
 				issueNext = False
@@ -121,8 +137,8 @@ def issueItems(rfID):
 				time.sleep(2)
 	
 		if not issueNext: break
-	print("Pending Issues: " , tobeIssued)
-	print("Current Issued: " , currIssued)
+	#print("Pending Issues: " , tobeIssued)
+	#print("Current Issued: " , currIssued)
 	writeRecord(rfID,tobeIssued,currIssued,groupNo)
 	return
 	
@@ -132,8 +148,6 @@ def setIssueValues(count):
 		print("Enter Count for item" , i) 
 		val= int(input())
 		tobeIssued.append(val)
-	
-	#currIssued = [0] * count
 	
 	data = findAllRecords()
 	for rfID in data:
@@ -147,15 +161,15 @@ def returnItems(count):
 	val=0
 	while(1):
 		print("Enter group number to be updated. Enter 0 to update for all groups, -1 to exit")
-		val=int(input())
-		if(val==-1):
+		val=input()
+		if(val=="#"):
 			break
 		temp=[]
 		for i in range(0,count):
 			print("Enter return count for item" , i) 
 			val2= int(input())
 			temp.append(val2)
-		if(val==0):
+		if(val=="0"):
 			data = findAllRecords()
 			for rfID in data:
 				tobeIssued=data[rfID][0]
@@ -164,14 +178,13 @@ def returnItems(count):
 				for j in range(0,count):
 					currIssued[j]=max(0,currIssued[j]-temp[j])
 				writeRecord(rfID,tobeIssued,currIssued,groupNo)
-		if(val!=0):
+		if(val!="0"):
 			data = findAllRecords()
 			for rfID in data:
 				tobeIssued=data[rfID][0]
 				currIssued=data[rfID][1]
 				groupNo=data[rfID][2]
-				print(val, groupNo)
-				if groupNo!=val:
+				if groupNo!=int(val):
 					continue
 				for j in range(0,count):
 					currIssued[j]=max(0,currIssued[j]-temp[j])
@@ -212,23 +225,18 @@ def menu():
 		print("1->Student")
 		print("2->Instructor")
 		print("3->Exit")
-		#later change to matrix keypad
 		
 		val= int(input())
 		
 		if val==1:
-			#student
 			rfID = readRFID()
 			issueItems(rfID)
 		if val==2:
-			#professor
-			
 			print("Enter Password: ")
 			password=int(input())
-			if password!=PASSWORD:
+			if password != PASSWORD:
 				continue
 			professor()
-			#open lock
 			
 		if val==3:
 			break
