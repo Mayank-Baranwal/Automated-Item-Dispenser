@@ -40,4 +40,4 @@ def runMotor(whichMotor, numRotations):
 	GPIO.cleanup()
 
 #print("Going in the function!")
-runMotor(3,1)
+runMotor(2,1000)

@@ -46,4 +46,13 @@ def oneRotation():
 def cleanup():
 	GPIO.cleanup()
 
-rotateMotor(100)
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
+GPIO.setup(10,GPIO.OUT)
+GPIO.setup(12,GPIO.OUT)
+GPIO.setup(26,GPIO.OUT)
+GPIO.output(10,0)
+GPIO.output(12,1)
+GPIO.output(26,0)
+rotateMotor(2)
