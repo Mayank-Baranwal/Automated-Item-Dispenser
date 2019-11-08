@@ -36,10 +36,14 @@ def setup():
 		GPIO.output(pin, 0)
 	
 def oneRotation():
-	for halfstep in range(8):
-		for pin in range(4):
-			GPIO.output(control_pins[pin], halfstep_seq[halfstep][pin])
-		time.sleep(0.001)
+	for _ in range(525):
+		for halfstep in range(8):
+			for pin in range(4):
+				GPIO.output(control_pins[pin], halfstep_seq[halfstep][pin])
+			time.sleep(0.001)
 	
 def cleanup():
 	GPIO.cleanup()
+
+
+# rotateMotor(5)

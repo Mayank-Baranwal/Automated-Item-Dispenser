@@ -1,8 +1,8 @@
 import RPi.GPIO as GPIO
 import time
 
-control = [5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10]
-control = [10, 3]
+#control = [5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10]
+control = [7.5, 3]
 
 
 servo = 5
@@ -54,5 +54,6 @@ def closeDoor():
 		endProgram()
 	return
 
-openDoor()
+#openDoor()
 closeDoor()
+openDoor()

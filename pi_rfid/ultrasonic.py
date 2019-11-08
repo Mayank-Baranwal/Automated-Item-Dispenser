@@ -59,7 +59,7 @@ def foo():
 		item_dispatched = False
 		item_picked = False
 		
-		for _ in range(0,10):
+		for _ in range(0,100):
 			dist = distance()
 			print ("Measured Distance = %.1f cm" % dist)
 			
@@ -77,7 +77,7 @@ def foo():
 	# Reset by pressing CTRL + C
 	except KeyboardInterrupt:
 		print("Measurement stopped by User")
+	finally:
 		GPIO.cleanup()
-
 
 foo()
