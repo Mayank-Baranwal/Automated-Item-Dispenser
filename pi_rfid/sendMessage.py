@@ -4,9 +4,8 @@ import paho.mqtt.client as mqtt
 
 # This is the Publisher
 
-receiver_address = "172.16.116.139"
+receiver_address = "localhost"
 client = mqtt.Client()
-
 
 def publishMessage(message,topic):
 	client.connect(receiver_address)
@@ -14,5 +13,7 @@ def publishMessage(message,topic):
 	client.disconnect()
 	
 
+if __name__ == "__main__":
+	publishMessage("Llahh 0","topic/Dispenser")
 
 

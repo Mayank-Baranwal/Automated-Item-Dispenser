@@ -61,7 +61,7 @@ def input():
 		pass
 		
 	ip = kp.returnInput()
-	kp.__del__()
+	kp.__del__() # Apparently this isn't working #
 	#del kp
 	
 	return ip

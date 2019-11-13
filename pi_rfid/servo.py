@@ -1,8 +1,8 @@
 import RPi.GPIO as GPIO
 import time
 
-control = [5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10]
-control = [10, 3]
+#control = [5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10]
+control = [7.5, 3]
 
 
 servo = 5
@@ -30,26 +30,28 @@ def endProgram():
 	GPIO.cleanup()
 	return
 
-def openDoor():
+def closeDoor():
 	try:
 		p=setup()
-		#p.ChangeDutyCycle(10)
 		for x in range(1):
 			p.ChangeDutyCycle(control[x])
-			time.sleep(0.5)
-			print (control[x])
+			time.sleep(2)
 	finally:
 		endProgram()
 	return
 
-def closeDoor():
+def openDoor():
 	try:
 		p=setup()
-		#p.ChangeDutyCycle(10)
 		for x in range(1,2):
 			p.ChangeDutyCycle(control[x])
-			time.sleep(0.5)
-			print (control[x])
+			time.sleep(2)
 	finally:
 		endProgram()
 	return
+
+
+
+if __name__ == "__main__":
+	#openDoor()
+	closeDoor()

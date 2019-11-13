@@ -33,10 +33,7 @@ def onMessage(client, userdata, message):
 		sendMail("Item Dispenser Warning",pickupFailureMsg % (items[whichItem]))
 		
 	return
-	
-def myMessage(client,userdata,message):
-	message = str(message.payload.decode('utf-8'))
-	print(message)
+
 		
 client = mqtt.Client("server")
 client.on_connect = on_connect

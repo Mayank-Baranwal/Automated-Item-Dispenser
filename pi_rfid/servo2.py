@@ -30,7 +30,7 @@ def endProgram():
 	GPIO.cleanup()
 	return
 
-def openDoor():
+def closeDoor():
 	try:
 		p=setup()
 		#p.ChangeDutyCycle(10)
@@ -42,7 +42,7 @@ def openDoor():
 		endProgram()
 	return
 
-def closeDoor():
+def openDoor():
 	try:
 		p=setup()
 		#p.ChangeDutyCycle(10)
@@ -54,6 +54,8 @@ def closeDoor():
 		endProgram()
 	return
 
-#openDoor()
-closeDoor()
 openDoor()
+closeDoor()
+#for x in range (5):
+#	openDoor()
+#	closeDoor()

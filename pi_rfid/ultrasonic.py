@@ -5,8 +5,8 @@ import time
     
 
 def distance():
-	#GPIO Mode (BOARD / BCM)
 	GPIO.setmode(GPIO.BCM)
+	GPIO.setwarnings(False)
 
 	#set GPIO Pins
 	GPIO_TRIGGER = 23
@@ -33,37 +33,26 @@ def distance():
 	while GPIO.input(GPIO_ECHO) == 1:
 		StopTime = time.time()
 
-
-    # time difference between start and arrival
 	TimeElapsed = StopTime - StartTime
+	
     # multiply with the sonic speed (34300 cm/s)
     # and divide by 2, because there and back
+    
 	distance = (TimeElapsed * 34300) / 2
 
 	return distance
 
 def foo():
-	
-	#GPIO Mode (BOARD / BCM)
-	GPIO.setmode(GPIO.BCM)
-
-	#set GPIO Pins
-	GPIO_TRIGGER = 23
-	GPIO_ECHO = 24
-
-	#set GPIO direction (IN / OUT)
-	GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
-	GPIO.setup(GPIO_ECHO, GPIO.IN)
 
 	try:
 		item_dispatched = False
 		item_picked = False
 		
-		for _ in range(0,100):
+		for _ in range(0,20):
 			dist = distance()
 			print ("Measured Distance = %.1f cm" % dist)
 			
-			if dist < 20:
+			if dist < 28:
 				item_dispatched = True
 			elif item_dispatched :
 				item_picked = True
@@ -80,4 +69,5 @@ def foo():
 	finally:
 		GPIO.cleanup()
 
-foo()
+if __name__ == "__main__":
+	foo()
