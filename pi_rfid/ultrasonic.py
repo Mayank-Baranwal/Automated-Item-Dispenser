@@ -51,7 +51,7 @@ def foo():
 		for _ in range(0,25):
 			dist = distance()
 			
-			print ("Measured Distance = %.1f cm" % dist)
+			#print ("Measured Distance = %.1f cm" % dist)
 			
 			if(dist > 22):
 				time.sleep(0.4)
@@ -67,6 +67,7 @@ def foo():
 			elif item_dispatched :
 				item_picked = True
 				toReturn = 2
+				#return 2
 				
 			time.sleep(0.4)
 
