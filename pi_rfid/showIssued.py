@@ -18,8 +18,8 @@ topic = "topic/Dispenser"
 PASSWORD=5
 
 item = {
-	"RED" : "Multiplexer",
-	"GREEN": "Up Down Counter",
+	"RED" : "Up Down Counter",
+	"GREEN": "Multiplexer",
 	"BLUE": "Wires",
 }
 
@@ -29,7 +29,7 @@ itemNum = {
 	"BLUE": 2,
 }
 
-itemName = ["Multiplexer", "Up Down Counter", "Wires"]
+itemName = ["Up Down Counter","Multiplexer", "Wires"]
 
 ''' Gets all the counts in the inventory '''
 def getAllCounts():
@@ -108,6 +108,11 @@ def readRecord(rfID):
 def issueItems(rfID):
 	tobeIssued, currIssued, groupNo = readRecord(rfID) 
 	issueNext = True
+	print("Welcome Group", groupNo)
+	print("Items to be Issued: ")
+	for i in range(3):
+		print(itemName[i],":",tobeIssued[i])
+		
 	for i,itemCount in enumerate(tobeIssued):
 		if(itemCount <= 0):
 			continue
@@ -115,11 +120,18 @@ def issueItems(rfID):
 		for _ in range(0,itemCount):
 			allCounts = getAllCounts()
 			if(allCounts[i] <= 0):
+				print("Low Inventory for", itemName[i])
 				sendMessage.publishMessage("Low Inventory " + str(i), topic)
 				break
+				
+			time.sleep(2)
 			runMotor.runMotor(i,1) # Called Rotation for Spring #
+			
+			
 			# IF PROXIMITY Doesn't reply in 10s CALL FAILURE #
 			status = ultrasonic.foo()
+			
+			
 			if status == 0:
 				print('Could not dispense item! Reporting to Professor')
 				sendMessage.publishMessage("Dispensing Failed " + str(i),topic)
@@ -134,13 +146,14 @@ def issueItems(rfID):
 				changeCount(i,1)
 				break
 			else:
+				print("issued Item", itemName[i])
 				tobeIssued[i] -= 1
 				currIssued[i] += 1
 				changeCount(i,1)
 				time.sleep(2)
 				
 		if not issueNext: break
-		time.sleep(3)
+		
 	writeRecord(rfID,tobeIssued,currIssued,groupNo)
 	return
 	

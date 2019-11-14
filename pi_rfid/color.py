@@ -70,7 +70,7 @@ def getColour():
 	endprogram()
 	maxColor = max(r,g,b)
 	
-	print("Final Readings:",r,g,b)
+	#print("Final Readings:",r,g,b)
 	
 	if( maxColor < 3000 ):
 		return "NOTHING"

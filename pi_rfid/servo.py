@@ -62,6 +62,6 @@ def openDoor():
 
 
 if __name__ == "__main__":
-	for _ in range(5):
-		#openDoor()
-		closeDoor()
+	#for _ in range(5):
+	openDoor()
+	#closeDoor()

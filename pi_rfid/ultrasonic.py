@@ -47,32 +47,30 @@ def foo():
 	try:
 		item_dispatched = False
 		item_picked = False
-		takeNext = True
-		
-		for _ in range(0,10):
+		toReturn = 0
+		for _ in range(0,25):
 			dist = distance()
 			
-			if( not takeNext):
-				takeNext = True
-				continue 
-				
 			print ("Measured Distance = %.1f cm" % dist)
 			
-			if(dist > 200):
-				takeNext = False
-				time.sleep(0.6)
+			if(dist > 22):
+				time.sleep(0.4)
 				continue	
 			
-			if dist < 34:
+			if dist < 15:
 				item_dispatched = True
-				time.sleep(1)
+				toReturn = 1
+				#for temp in range(8):
+				#	time.sleep(0.4)
+				#	dist = distance()
+				#time.sleep(1)
 			elif item_dispatched :
 				item_picked = True
-				return 2
+				toReturn = 2
 				
-			time.sleep(1)
+			time.sleep(0.4)
 
-		return item_dispatched
+		return toReturn
 		
 		
 	# Reset by pressing CTRL + C
@@ -86,3 +84,4 @@ def foo():
 if __name__ == "__main__":
 	while(4):
 		foo()
+		time.sleep(0.1)
