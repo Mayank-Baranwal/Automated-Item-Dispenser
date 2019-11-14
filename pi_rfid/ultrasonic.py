@@ -47,13 +47,25 @@ def foo():
 	try:
 		item_dispatched = False
 		item_picked = False
+		takeNext = True
 		
-		for _ in range(0,20):
+		for _ in range(0,10):
 			dist = distance()
+			
+			if( not takeNext):
+				takeNext = True
+				continue 
+				
 			print ("Measured Distance = %.1f cm" % dist)
 			
-			if dist < 28:
+			if(dist > 200):
+				takeNext = False
+				time.sleep(0.6)
+				continue	
+			
+			if dist < 34:
 				item_dispatched = True
+				time.sleep(1)
 			elif item_dispatched :
 				item_picked = True
 				return 2
@@ -66,8 +78,11 @@ def foo():
 	# Reset by pressing CTRL + C
 	except KeyboardInterrupt:
 		print("Measurement stopped by User")
+		#GPIO.cleanup()
+		#exit(0)
 	finally:
 		GPIO.cleanup()
 
 if __name__ == "__main__":
-	foo()
+	while(4):
+		foo()

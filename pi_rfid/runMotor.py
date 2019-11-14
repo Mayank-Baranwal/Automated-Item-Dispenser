@@ -33,9 +33,7 @@ def runMotor(whichMotor, numRotations):
 
 
 if __name__ == "__main__":
-	runMotor(1,1)
-	#runMotor(1,1)
-	#runMotor(2,1)
+	runMotor(0,1)
 	
 
 

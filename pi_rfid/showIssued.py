@@ -138,9 +138,9 @@ def issueItems(rfID):
 				currIssued[i] += 1
 				changeCount(i,1)
 				time.sleep(2)
-	
+				
 		if not issueNext: break
-		
+		time.sleep(3)
 	writeRecord(rfID,tobeIssued,currIssued,groupNo)
 	return
 	
@@ -197,7 +197,7 @@ def returnItems(count):
 def professor():
 	val=0
 	while (1):
-		print("1->Increment Weekly issues")
+		print("1->Set Weekly issues")
 		print("2->Add items")
 		print("3->Update returned Items")
 		print("4->Exit")

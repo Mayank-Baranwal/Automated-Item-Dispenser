@@ -23,12 +23,21 @@ def setup():
 	GPIO.setmode(GPIO.BCM)
 	GPIO.setup(servo,GPIO.OUT)
 	p=GPIO.PWM(servo,50)# 50hz frequency
+	p.start(5)# starting duty cycle ( it set the servo to 0 degree )
+	return p
+
+
+def endProgram():
+	GPIO.cleanup()
+	returO.PWM(servo,50)# 50hz frequency
 	p.start(0)# starting duty cycle ( it set the servo to 0 degree )
 	return p
+
 
 def endProgram():
 	GPIO.cleanup()
 	return
+
 
 def closeDoor():
 	try:
@@ -39,6 +48,7 @@ def closeDoor():
 	finally:
 		endProgram()
 	return
+
 
 def openDoor():
 	try:
@@ -51,7 +61,7 @@ def openDoor():
 	return
 
 
-
 if __name__ == "__main__":
-	#openDoor()
-	closeDoor()
+	for _ in range(5):
+		#openDoor()
+		closeDoor()
